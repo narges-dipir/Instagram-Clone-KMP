@@ -1,4 +1,4 @@
-package de.app.instagram.profile.presentation
+package de.app.instagram.profile.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import de.app.instagram.profile.presentation.state.ProfileUiState
 
 @Composable
 fun ProfileScreen(

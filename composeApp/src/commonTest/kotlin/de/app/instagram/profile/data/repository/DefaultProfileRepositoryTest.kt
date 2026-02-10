@@ -1,10 +1,10 @@
-package de.app.instagram.profile.domain
+package de.app.instagram.profile.data.repository
 
-import de.app.instagram.profile.data.ProfileApi
-import de.app.instagram.profile.data.ProfileDto
-import de.app.instagram.profile.data.ProfilePostDto
-import de.app.instagram.profile.data.ProfileStatsDto
-import de.app.instagram.profile.data.StoryHighlightDto
+import de.app.instagram.profile.data.remote.ProfileApi
+import de.app.instagram.profile.data.remote.ProfileDto
+import de.app.instagram.profile.data.remote.ProfilePostDto
+import de.app.instagram.profile.data.remote.ProfileStatsDto
+import de.app.instagram.profile.data.remote.StoryHighlightDto
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest

@@ -1,6 +1,11 @@
-package de.app.instagram.profile.domain
+package de.app.instagram.profile.data.repository
 
-import de.app.instagram.profile.data.ProfileApi
+import de.app.instagram.profile.data.remote.ProfileApi
+import de.app.instagram.profile.domain.model.Profile
+import de.app.instagram.profile.domain.model.ProfilePost
+import de.app.instagram.profile.domain.model.ProfileStats
+import de.app.instagram.profile.domain.model.StoryHighlight
+import de.app.instagram.profile.domain.repository.ProfileRepository
 
 class DefaultProfileRepository(
     private val profileApi: ProfileApi,

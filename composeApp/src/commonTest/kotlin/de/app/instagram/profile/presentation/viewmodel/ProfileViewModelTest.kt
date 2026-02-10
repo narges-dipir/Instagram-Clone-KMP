@@ -1,11 +1,12 @@
-package de.app.instagram.profile.presentation
+package de.app.instagram.profile.presentation.viewmodel
 
-import de.app.instagram.profile.domain.GetProfileUseCase
-import de.app.instagram.profile.domain.Profile
-import de.app.instagram.profile.domain.ProfilePost
-import de.app.instagram.profile.domain.ProfileRepository
-import de.app.instagram.profile.domain.ProfileStats
-import de.app.instagram.profile.domain.StoryHighlight
+import de.app.instagram.profile.domain.model.Profile
+import de.app.instagram.profile.domain.model.ProfilePost
+import de.app.instagram.profile.domain.model.ProfileStats
+import de.app.instagram.profile.domain.model.StoryHighlight
+import de.app.instagram.profile.domain.repository.ProfileRepository
+import de.app.instagram.profile.domain.usecase.GetProfileUseCase
+import de.app.instagram.profile.presentation.state.ProfileUiState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

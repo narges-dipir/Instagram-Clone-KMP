@@ -1,6 +1,6 @@
-package de.app.instagram.profile.presentation
+package de.app.instagram.profile.presentation.state
 
-import de.app.instagram.profile.domain.Profile
+import de.app.instagram.profile.domain.model.Profile
 
 sealed interface ProfileUiState {
     data object Loading : ProfileUiState

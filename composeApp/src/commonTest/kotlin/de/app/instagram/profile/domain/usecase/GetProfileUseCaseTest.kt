@@ -1,5 +1,9 @@
-package de.app.instagram.profile.domain
+package de.app.instagram.profile.domain.usecase
 
+import de.app.instagram.profile.domain.model.Profile
+import de.app.instagram.profile.domain.model.ProfileStats
+import de.app.instagram.profile.domain.repository.ProfileRepository
+import de.app.instagram.profile.domain.usecase.GetProfileUseCase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest

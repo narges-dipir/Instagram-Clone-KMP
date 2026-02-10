@@ -1,6 +1,7 @@
-package de.app.instagram.profile.presentation
+package de.app.instagram.profile.presentation.viewmodel
 
-import de.app.instagram.profile.domain.GetProfileUseCase
+import de.app.instagram.profile.domain.usecase.GetProfileUseCase
+import de.app.instagram.profile.presentation.state.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

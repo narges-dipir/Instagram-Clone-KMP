@@ -1,4 +1,4 @@
-package de.app.instagram.profile.data
+package de.app.instagram.profile.data.remote
 
 import de.app.instagram.network.NetworkModule
 import io.ktor.client.engine.mock.MockEngine

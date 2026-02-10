@@ -1,4 +1,4 @@
-package de.app.instagram.profile.domain
+package de.app.instagram.profile.domain.model
 
 data class Profile(
     val id: String,

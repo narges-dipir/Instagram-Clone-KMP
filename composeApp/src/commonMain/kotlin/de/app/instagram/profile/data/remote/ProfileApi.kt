@@ -1,4 +1,4 @@
-package de.app.instagram.profile.data
+package de.app.instagram.profile.data.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
