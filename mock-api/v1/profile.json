@@ -1,0 +1,92 @@
+{
+  "id": "u_001",
+  "username": "narges",
+  "fullName": "Narges Dipir",
+  "bio": "Android and KMP developer. Building an Instagram clone with Compose Multiplatform.",
+  "isVerified": false,
+  "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
+  "stats": {
+    "posts": 24,
+    "followers": 1280,
+    "following": 312
+  },
+  "website": "https://github.com/nargesdipir",
+  "storyHighlights": [
+    {
+      "id": "h_001",
+      "title": "Travel",
+      "coverUrl": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80",
+      "mediaUrls": [
+        "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=80"
+      ]
+    },
+    {
+      "id": "h_002",
+      "title": "Work",
+      "coverUrl": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=300&q=80",
+      "mediaUrls": [
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80"
+      ]
+    },
+    {
+      "id": "h_003",
+      "title": "Food",
+      "coverUrl": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=300&q=80",
+      "mediaUrls": [
+        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=900&q=80"
+      ]
+    }
+  ],
+  "posts": [
+    {
+      "id": "p_001",
+      "imageUrl": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-5s.mp4",
+      "likes": 321,
+      "comments": 18
+    },
+    {
+      "id": "p_002",
+      "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-10s.mp4",
+      "likes": 210,
+      "comments": 9
+    },
+    {
+      "id": "p_003",
+      "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-5s.mp4",
+      "likes": 442,
+      "comments": 34
+    },
+    {
+      "id": "p_004",
+      "imageUrl": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80",
+      "likes": 184,
+      "comments": 6
+    },
+    {
+      "id": "p_005",
+      "imageUrl": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+      "likes": 517,
+      "comments": 41
+    },
+    {
+      "id": "p_006",
+      "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-10s.mp4",
+      "likes": 390,
+      "comments": 22
+    }
+  ]
+}

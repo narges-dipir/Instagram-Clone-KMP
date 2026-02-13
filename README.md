@@ -1,35 +1,59 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Instagram Clone (KMP)
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shared UI using Compose Multiplatform.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Preview
+<p align="center">
+  <img src="docs/images/profile-preview.png" alt="Profile screen preview" width="280" />
+</p>
 
-### Build and Run Android Application
+## Features
+- Profile screen with editable profile data (username, full name, bio, website)
+- Instagram-like highlights strip with gradient story rings
+- Clickable highlights with story viewer behavior
+- Multi-image highlight stories with:
+  - horizontal swipe pager
+  - tap-left / tap-right navigation
+  - auto-advance progress bars
+- Post grid with image + video posts
+- Post detail screen with:
+  - Android/iOS video playback
+  - like and comment actions
+  - local-only persistence for likes/comments (no server write)
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## Data Source
+- App reads profile data from GitHub Pages JSON:
+  - `mock-api/v1/profile.json`
+- If you change mock data locally, push/deploy to GitHub Pages so devices load the latest payload.
 
-### Build and Run iOS Application
+## Project Structure
+- `composeApp/src/commonMain` shared UI/domain/data logic
+- `composeApp/src/androidMain` Android-specific implementations (video player, back handler)
+- `composeApp/src/iosMain` iOS-specific implementations (video player, back handler)
+- `iosApp` iOS app entry project for Xcode
+- `mock-api` JSON payload used by remote profile API
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+## Build
+### Android
+```bash
+./gradlew :composeApp:assembleDebug
+```
 
----
+### iOS (Kotlin framework compile)
+```bash
+./gradlew :composeApp:compileKotlinIosSimulatorArm64
+```
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+### Tests
+```bash
+./gradlew :composeApp:testDebugUnitTest
+```
+
+## Tech Stack
+- Kotlin Multiplatform
+- Compose Multiplatform
+- Koin
+- Ktor
+- Coil 3
+- Media3 (Android video)
+- AVPlayerViewController (iOS video)
