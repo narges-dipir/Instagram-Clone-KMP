@@ -1,0 +1,36 @@
+{
+  "page": 3,
+  "hasNext": false,
+  "items": [
+    {
+      "id": "r_013",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/noon/DontDrinkSodaWithYourFood.mp4",
+      "caption": "No soda challenge"
+    },
+    {
+      "id": "r_014",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/TwoWheelsFreeFitnessPureHappiness.mp4",
+      "caption": "Cycling for happiness"
+    },
+    {
+      "id": "r_015",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/StayAwayFromSugarySnacks.mp4",
+      "caption": "Cut sugar, keep focus"
+    },
+    {
+      "id": "r_016",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesUsFromBurnouts.mp4",
+      "caption": "Workout over burnout"
+    },
+    {
+      "id": "r_017",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/SugarIsNotAGoodSnack.mp4",
+      "caption": "Healthy snack reminder"
+    },
+    {
+      "id": "r_018",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesYouFromBurnouts.mp4",
+      "caption": "Move today, recover better"
+    }
+  ]
+}

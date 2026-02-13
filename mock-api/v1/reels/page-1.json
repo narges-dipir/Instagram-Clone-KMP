@@ -1,0 +1,36 @@
+{
+  "page": 1,
+  "hasNext": true,
+  "items": [
+    {
+      "id": "r_001",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesUsFromBurnouts.mp4",
+      "caption": "A little workout saves us from burnouts"
+    },
+    {
+      "id": "r_002",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesYouFromBurnouts.mp4",
+      "caption": "A little workout saves you from burnouts"
+    },
+    {
+      "id": "r_003",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/TwoWheelsFreeFitnessPureHappiness.mp4",
+      "caption": "Two wheels, free fitness, pure happiness"
+    },
+    {
+      "id": "r_004",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/StayAwayFromSugarySnacks.mp4",
+      "caption": "Stay away from sugary snacks"
+    },
+    {
+      "id": "r_005",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/SugarIsNotAGoodSnack.mp4",
+      "caption": "Sugar is not a good snack"
+    },
+    {
+      "id": "r_006",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/noon/DontDrinkSodaWithYourFood.mp4",
+      "caption": "Don't drink soda with your food"
+    }
+  ]
+}

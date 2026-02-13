@@ -3,6 +3,10 @@ package de.app.instagram.profile.presentation.viewmodel
 import de.app.instagram.profile.data.local.InMemoryPostInteractionStore
 import de.app.instagram.profile.data.local.LocalPostInteraction
 import de.app.instagram.profile.data.local.PostInteractionStore
+import de.app.instagram.feed.domain.model.FeedMediaType
+import de.app.instagram.feed.domain.model.FeedPost
+import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
+import de.app.instagram.profile.domain.model.PostMediaType
 import de.app.instagram.profile.domain.usecase.GetProfileUseCase
 import de.app.instagram.profile.domain.model.ProfilePost
 import de.app.instagram.profile.domain.model.StoryHighlight
@@ -18,11 +22,14 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val getProfileUseCase: GetProfileUseCase,
+    private val getFeedPageUseCase: GetFeedPageUseCase,
     private val postInteractionStore: PostInteractionStore = InMemoryPostInteractionStore(),
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    private var nextPostsPage = 1
+    private var postsLoopRound = 0
 
     init {
         loadProfile()
@@ -32,11 +39,23 @@ class ProfileViewModel(
         scope.launch {
             _uiState.value = ProfileUiState.Loading
             _uiState.value = try {
+                nextPostsPage = 1
+                postsLoopRound = 0
                 val profile = getProfileUseCase()
+                val initialPosts = runCatching { getFeedPageUseCase(nextPostsPage) }.getOrNull()
+                val mappedInitialPosts = initialPosts?.items.orEmpty().mapToProfilePosts(postsLoopRound)
+                if (initialPosts != null) {
+                    if (initialPosts.hasNext) {
+                        nextPostsPage = initialPosts.page + 1
+                    } else {
+                        nextPostsPage = 1
+                        postsLoopRound = 1
+                    }
+                }
                 val localInteractions = postInteractionStore.readAll()
                 ProfileUiState.Success(
                     profile = profile.copy(
-                        posts = profile.posts.map { post ->
+                        posts = mappedInitialPosts.map { post ->
                             val local = localInteractions[post.id]
                             if (local == null) {
                                 post
@@ -48,13 +67,19 @@ class ProfileViewModel(
                                     recentComments = local.comments,
                                 )
                             }
-                        }
+                        },
+                        stats = profile.stats.copy(posts = mappedInitialPosts.size),
                     ),
                     isEditing = false,
                     editDraft = EditProfileDraft.fromProfile(profile),
                     editError = null,
                     selectedPost = null,
                     selectedHighlight = null,
+                    postsErrorMessage = if (initialPosts == null) {
+                        "Could not load posts."
+                    } else {
+                        null
+                    },
                 )
             } catch (throwable: Throwable) {
                 ProfileUiState.Error(throwable.message ?: "Failed to load profile")
@@ -148,6 +173,63 @@ class ProfileViewModel(
         _uiState.value = successState.copy(selectedHighlight = null)
     }
 
+    fun loadMorePosts() {
+        val successState = _uiState.value as? ProfileUiState.Success ?: return
+        if (successState.isLoadingMorePosts) return
+
+        _uiState.value = successState.copy(
+            isLoadingMorePosts = true,
+            postsErrorMessage = null,
+        )
+
+        scope.launch {
+            runCatching { getFeedPageUseCase(nextPostsPage) }
+                .onSuccess { pageData ->
+                    val localInteractions = postInteractionStore.readAll()
+                    val loadedPosts = pageData.items
+                        .mapToProfilePosts(postsLoopRound)
+                        .map { post ->
+                            val local = localInteractions[post.id]
+                            if (local == null) {
+                                post
+                            } else {
+                                post.copy(
+                                    likes = post.likes + if (local.isLikedByMe) 1 else 0,
+                                    comments = post.comments + local.comments.size,
+                                    isLikedByMe = local.isLikedByMe,
+                                    recentComments = local.comments,
+                                )
+                            }
+                        }
+
+                    val latest = _uiState.value as? ProfileUiState.Success ?: return@onSuccess
+                    val updatedPosts = latest.profile.posts + loadedPosts
+                    _uiState.value = latest.copy(
+                        profile = latest.profile.copy(
+                            posts = updatedPosts,
+                            stats = latest.profile.stats.copy(posts = updatedPosts.size),
+                        ),
+                        isLoadingMorePosts = false,
+                        postsErrorMessage = null,
+                    )
+
+                    if (pageData.hasNext) {
+                        nextPostsPage = pageData.page + 1
+                    } else {
+                        nextPostsPage = 1
+                        postsLoopRound += 1
+                    }
+                }
+                .onFailure { throwable ->
+                    val latest = _uiState.value as? ProfileUiState.Success ?: return@onFailure
+                    _uiState.value = latest.copy(
+                        isLoadingMorePosts = false,
+                        postsErrorMessage = throwable.message ?: "Could not load more posts",
+                    )
+                }
+        }
+    }
+
     fun toggleLikeForSelectedPost() {
         val successState = _uiState.value as? ProfileUiState.Success ?: return
         val selected = successState.selectedPost ?: return
@@ -228,6 +310,23 @@ class ProfileViewModel(
                     isLikedByMe = updatedPost.isLikedByMe,
                     comments = updatedPost.recentComments,
                 ),
+            )
+        }
+    }
+
+    private fun List<FeedPost>.mapToProfilePosts(round: Int): List<ProfilePost> {
+        return map { feedPost ->
+            ProfilePost(
+                id = "${feedPost.id}_r$round",
+                imageUrl = feedPost.imageUrl,
+                mediaType = if (feedPost.mediaType == FeedMediaType.VIDEO) {
+                    PostMediaType.VIDEO
+                } else {
+                    PostMediaType.IMAGE
+                },
+                videoUrl = feedPost.videoUrl,
+                likes = feedPost.likes,
+                comments = feedPost.comments,
             )
         }
     }
