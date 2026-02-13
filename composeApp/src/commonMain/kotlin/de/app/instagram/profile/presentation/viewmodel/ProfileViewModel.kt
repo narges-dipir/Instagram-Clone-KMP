@@ -5,6 +5,7 @@ import de.app.instagram.profile.data.local.LocalPostInteraction
 import de.app.instagram.profile.data.local.PostInteractionStore
 import de.app.instagram.profile.domain.usecase.GetProfileUseCase
 import de.app.instagram.profile.domain.model.ProfilePost
+import de.app.instagram.profile.domain.model.StoryHighlight
 import de.app.instagram.profile.presentation.state.EditProfileDraft
 import de.app.instagram.profile.presentation.state.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +54,7 @@ class ProfileViewModel(
                     editDraft = EditProfileDraft.fromProfile(profile),
                     editError = null,
                     selectedPost = null,
+                    selectedHighlight = null,
                 )
             } catch (throwable: Throwable) {
                 ProfileUiState.Error(throwable.message ?: "Failed to load profile")
@@ -67,6 +69,7 @@ class ProfileViewModel(
             editDraft = EditProfileDraft.fromProfile(successState.profile),
             editError = null,
             selectedPost = null,
+            selectedHighlight = null,
         )
     }
 
@@ -77,6 +80,7 @@ class ProfileViewModel(
             editDraft = EditProfileDraft.fromProfile(successState.profile),
             editError = null,
             selectedPost = null,
+            selectedHighlight = null,
         )
     }
 
@@ -110,6 +114,7 @@ class ProfileViewModel(
             editDraft = EditProfileDraft.fromProfile(updatedProfile),
             editError = null,
             selectedPost = null,
+            selectedHighlight = null,
         )
     }
 
@@ -119,12 +124,28 @@ class ProfileViewModel(
             isEditing = false,
             editError = null,
             selectedPost = post,
+            selectedHighlight = null,
         )
     }
 
     fun closePost() {
         val successState = _uiState.value as? ProfileUiState.Success ?: return
         _uiState.value = successState.copy(selectedPost = null)
+    }
+
+    fun openHighlight(highlight: StoryHighlight) {
+        val successState = _uiState.value as? ProfileUiState.Success ?: return
+        _uiState.value = successState.copy(
+            isEditing = false,
+            editError = null,
+            selectedPost = null,
+            selectedHighlight = highlight,
+        )
+    }
+
+    fun closeHighlight() {
+        val successState = _uiState.value as? ProfileUiState.Success ?: return
+        _uiState.value = successState.copy(selectedHighlight = null)
     }
 
     fun toggleLikeForSelectedPost() {

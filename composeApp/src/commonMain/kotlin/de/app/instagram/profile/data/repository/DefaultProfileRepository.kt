@@ -27,10 +27,13 @@ class DefaultProfileRepository(
             ),
             website = dto.website,
             storyHighlights = dto.storyHighlights.map {
+                val fallbackMediaUrls = FALLBACK_HIGHLIGHT_MEDIA[it.id].orEmpty()
+                val resolvedMediaUrls = if (it.mediaUrls.isNotEmpty()) it.mediaUrls else fallbackMediaUrls
                 StoryHighlight(
                     id = it.id,
                     title = it.title,
                     coverUrl = it.coverUrl,
+                    mediaUrls = resolvedMediaUrls,
                 )
             },
             posts = dto.posts.map {
@@ -47,6 +50,26 @@ class DefaultProfileRepository(
                     comments = it.comments,
                 )
             },
+        )
+    }
+
+    private companion object {
+        val FALLBACK_HIGHLIGHT_MEDIA = mapOf(
+            "h_001" to listOf(
+                "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=80",
+            ),
+            "h_002" to listOf(
+                "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80",
+            ),
+            "h_003" to listOf(
+                "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+                "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=900&q=80",
+            ),
         )
     }
 }

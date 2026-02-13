@@ -43,6 +43,7 @@ data class StoryHighlightDto(
     val id: String,
     val title: String,
     val coverUrl: String,
+    val mediaUrls: List<String> = emptyList(),
 )
 
 @Serializable

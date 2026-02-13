@@ -38,6 +38,8 @@ fun App() {
                     onWebsiteChange = viewModel::updateWebsite,
                     onPostClick = viewModel::openPost,
                     onBackFromPost = viewModel::closePost,
+                    onHighlightClick = viewModel::openHighlight,
+                    onBackFromHighlight = viewModel::closeHighlight,
                     onToggleLikeClick = viewModel::toggleLikeForSelectedPost,
                     onAddCommentClick = viewModel::addCommentToSelectedPost,
                 )

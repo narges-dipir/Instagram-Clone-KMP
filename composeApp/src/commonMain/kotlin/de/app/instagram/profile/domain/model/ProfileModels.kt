@@ -23,6 +23,7 @@ data class StoryHighlight(
     val id: String,
     val title: String,
     val coverUrl: String,
+    val mediaUrls: List<String> = emptyList(),
 )
 
 data class ProfilePost(

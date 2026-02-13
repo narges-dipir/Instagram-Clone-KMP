@@ -46,6 +46,7 @@ class ProfileViewModelTest {
         assertEquals(expected.username, state.profile.username)
         assertFalse(state.isEditing)
         assertNull(state.selectedPost)
+        assertNull(state.selectedHighlight)
     }
 
     @Test
@@ -97,6 +98,7 @@ class ProfileViewModelTest {
         assertFalse(state.isEditing)
         assertNull(state.editError)
         assertNull(state.selectedPost)
+        assertNull(state.selectedHighlight)
         assertEquals("new_name", state.profile.username)
         assertEquals("New Name", state.profile.fullName)
         assertEquals("Updated bio", state.profile.bio)
@@ -155,6 +157,35 @@ class ProfileViewModelTest {
         val closedState = viewModel.uiState.value
         assertIs<ProfileUiState.Success>(closedState)
         assertNull(closedState.selectedPost)
+    }
+
+    @Test
+    fun openAndCloseHighlight_updatesSelectedHighlight() = runTest {
+        val repository = object : ProfileRepository {
+            override suspend fun getProfile(): Profile = testProfile()
+        }
+        val useCase = GetProfileUseCase(repository)
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val scope = TestScope(dispatcher)
+        val viewModel = ProfileViewModel(
+            getProfileUseCase = useCase,
+            postInteractionStore = InMemoryPostInteractionStore(),
+            scope = scope,
+        )
+        advanceUntilIdle()
+
+        val highlight = testProfile().storyHighlights.first()
+        viewModel.openHighlight(highlight)
+
+        val selectedState = viewModel.uiState.value
+        assertIs<ProfileUiState.Success>(selectedState)
+        assertEquals(highlight.id, selectedState.selectedHighlight?.id)
+
+        viewModel.closeHighlight()
+
+        val closedState = viewModel.uiState.value
+        assertIs<ProfileUiState.Success>(closedState)
+        assertNull(closedState.selectedHighlight)
     }
 
     @Test

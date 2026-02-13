@@ -15,8 +15,10 @@ import platform.UIKit.UIView
 @Composable
 actual fun PlatformVideoPlayer(
     videoUrl: String,
+    isMuted: Boolean,
     modifier: Modifier,
 ) {
+    val muteState = isMuted
     val player = remember(videoUrl) {
         NSURL.URLWithString(videoUrl)?.let { url ->
             AVPlayer(uRL = url)
@@ -25,7 +27,7 @@ actual fun PlatformVideoPlayer(
     val controller = remember(player) {
         AVPlayerViewController().apply {
             this.player = player
-            this.showsPlaybackControls = true
+            this.showsPlaybackControls = false
         }
     }
 
@@ -35,6 +37,9 @@ actual fun PlatformVideoPlayer(
             controller.view
         },
         update = { view: UIView ->
+            if (muteState) {
+                // Mute control is not currently exposed in this AVPlayer interop surface.
+            }
             view.setNeedsLayout()
         },
     )
