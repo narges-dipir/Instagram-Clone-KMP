@@ -1,6 +1,11 @@
 package de.app.instagram.profile.presentation.viewmodel
 
 import de.app.instagram.profile.data.local.InMemoryPostInteractionStore
+import de.app.instagram.feed.domain.model.FeedMediaType
+import de.app.instagram.feed.domain.model.FeedPost
+import de.app.instagram.feed.domain.model.FeedPostsPage
+import de.app.instagram.feed.domain.repository.FeedRepository
+import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
 import de.app.instagram.profile.domain.model.Profile
 import de.app.instagram.profile.domain.model.ProfilePost
 import de.app.instagram.profile.domain.model.ProfileStats
@@ -30,11 +35,13 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = expected
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
 
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -57,11 +64,13 @@ class ProfileViewModelTest {
             }
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
 
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -77,10 +86,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -111,10 +122,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -136,10 +149,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -165,10 +180,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -194,10 +211,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -219,10 +238,12 @@ class ProfileViewModelTest {
             override suspend fun getProfile(): Profile = testProfile()
         }
         val useCase = GetProfileUseCase(repository)
+        val feedUseCase = testFeedUseCase()
         val dispatcher = StandardTestDispatcher(testScheduler)
         val scope = TestScope(dispatcher)
         val viewModel = ProfileViewModel(
             getProfileUseCase = useCase,
+            getFeedPageUseCase = feedUseCase,
             postInteractionStore = InMemoryPostInteractionStore(),
             scope = scope,
         )
@@ -265,4 +286,29 @@ private fun testProfile(): Profile {
             )
         ),
     )
+}
+
+private fun testFeedUseCase(): GetFeedPageUseCase {
+    val repository = object : FeedRepository {
+        override suspend fun getPage(page: Int): FeedPostsPage {
+            return FeedPostsPage(
+                page = page,
+                hasNext = true,
+                items = listOf(
+                    FeedPost(
+                        id = "feed_001",
+                        username = "feed.user",
+                        avatarUrl = "https://example.com/avatar.jpg",
+                        imageUrl = "https://example.com/post.jpg",
+                        mediaType = FeedMediaType.IMAGE,
+                        videoUrl = null,
+                        likes = 10,
+                        comments = 2,
+                        caption = "test caption",
+                    )
+                ),
+            )
+        }
+    }
+    return GetFeedPageUseCase(repository)
 }

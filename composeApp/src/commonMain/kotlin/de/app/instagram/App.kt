@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +25,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
@@ -36,7 +43,9 @@ import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
@@ -68,6 +77,7 @@ import de.app.instagram.profile.presentation.ui.ProfileScreen
 import de.app.instagram.profile.presentation.viewmodel.ProfileViewModel
 import de.app.instagram.reels.presentation.state.ReelsUiState
 import de.app.instagram.reels.presentation.viewmodel.ReelsViewModel
+import de.app.instagram.ui.PlatformBackHandler
 import de.app.instagram.ui.PlatformVideoPlayer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -87,11 +97,36 @@ fun App() {
             val feedViewModel: FeedViewModel = koinInject()
             val feedUiState by feedViewModel.uiState.collectAsState()
             var selectedTab by remember { mutableStateOf(BottomTab.Profile) }
+            var showBottomBar by remember { mutableStateOf(true) }
+            val scrollAwareBottomBar = remember {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(
+                        available: Offset,
+                        source: NestedScrollSource,
+                    ): Offset {
+                        if (source == NestedScrollSource.UserInput) {
+                            if (available.y < -1f) {
+                                showBottomBar = false
+                            } else if (available.y > 1f) {
+                                showBottomBar = true
+                            }
+                        }
+                        return Offset.Zero
+                    }
+                }
+            }
+
+            PlatformBackHandler(
+                enabled = selectedTab == BottomTab.Reels,
+                onBack = { selectedTab = BottomTab.Home },
+            )
 
             Scaffold(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollAwareBottomBar),
                 bottomBar = {
-                    if (selectedTab != BottomTab.Reels) {
+                    if (showBottomBar) {
                         NavigationBar {
                             BottomTab.entries.forEach { tab ->
                                 NavigationBarItem(
@@ -125,6 +160,11 @@ fun App() {
                     BottomTab.Reels -> ReelsTabContent(
                         uiState = reelsUiState,
                         onLoadNextPage = reelsViewModel::loadNextPage,
+                        onToggleLike = reelsViewModel::toggleLike,
+                        onAddComment = reelsViewModel::addComment,
+                        onShare = reelsViewModel::share,
+                        onToggleSave = reelsViewModel::toggleSave,
+                        onToggleFollow = reelsViewModel::toggleFollow,
                         modifier = Modifier.padding(innerPadding),
                     )
 
@@ -160,12 +200,20 @@ fun App() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun ReelsTabContent(
     uiState: ReelsUiState,
     onLoadNextPage: () -> Unit,
+    onToggleLike: (String) -> Unit,
+    onAddComment: (String, String) -> Unit,
+    onShare: (String) -> Unit,
+    onToggleSave: (String) -> Unit,
+    onToggleFollow: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val reels = uiState.items
+    var commentTargetReelId by remember { mutableStateOf<String?>(null) }
+    var commentDraft by remember { mutableStateOf("") }
     val pagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { reels.size },
@@ -244,9 +292,9 @@ private fun ReelsTabContent(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 8.dp),
                     )
-                    TextButton(onClick = {}) {
+                    TextButton(onClick = { onToggleFollow(reel.id) }) {
                         Text(
-                            text = "Follow",
+                            text = if (reel.isFollowingCreator) "Following" else "Follow",
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
@@ -259,28 +307,114 @@ private fun ReelsTabContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     ReelAction(
-                        icon = Icons.Outlined.FavoriteBorder,
+                        icon = if (reel.isLikedByMe) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        },
                         label = formatCompactCount(reel.likes),
                         contentDescription = "Like",
+                        tint = if (reel.isLikedByMe) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.onPrimary
+                        },
+                        onClick = { onToggleLike(reel.id) },
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     ReelAction(
                         icon = Icons.Outlined.ChatBubbleOutline,
                         label = formatCompactCount(reel.comments),
                         contentDescription = "Comment",
+                        onClick = {
+                            commentTargetReelId = reel.id
+                            commentDraft = ""
+                        },
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     ReelAction(
                         icon = Icons.AutoMirrored.Outlined.Send,
-                        label = "Share",
+                        label = if (reel.shares == 0) "Share" else formatCompactCount(reel.shares),
                         contentDescription = "Share",
+                        onClick = { onShare(reel.id) },
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     ReelAction(
-                        icon = Icons.Outlined.BookmarkBorder,
-                        label = "Save",
+                        icon = if (reel.isSavedByMe) {
+                            Icons.Filled.Bookmark
+                        } else {
+                            Icons.Outlined.BookmarkBorder
+                        },
+                        label = if (reel.isSavedByMe) "Saved" else "Save",
                         contentDescription = "Save",
+                        onClick = { onToggleSave(reel.id) },
                     )
+                }
+            }
+        }
+
+        val commentReel = reels.firstOrNull { it.id == commentTargetReelId }
+        if (commentReel != null) {
+            ModalBottomSheet(
+                onDismissRequest = { commentTargetReelId = null },
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                ) {
+                    Text(
+                        text = "Comments",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (commentReel.recentComments.isEmpty()) {
+                        Text(
+                            text = "No local comments yet",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.height(180.dp),
+                        ) {
+                            items(commentReel.recentComments) { comment ->
+                                Text(
+                                    text = comment,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(vertical = 6.dp),
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = commentDraft,
+                        onValueChange = { commentDraft = it },
+                        placeholder = { Text("Add a comment...") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 12.dp),
+                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End,
+                    ) {
+                        TextButton(onClick = { commentTargetReelId = null }) {
+                            Text("Cancel")
+                        }
+                        TextButton(
+                            onClick = {
+                                onAddComment(commentReel.id, commentDraft)
+                                commentDraft = ""
+                                commentTargetReelId = null
+                            },
+                        ) {
+                            Text("Post")
+                        }
+                    }
                 }
             }
         }
@@ -305,12 +439,17 @@ private fun ReelAction(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     contentDescription: String,
+    tint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimary,
+    onClick: () -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick),
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = tint,
             modifier = Modifier.size(28.dp),
         )
         Text(

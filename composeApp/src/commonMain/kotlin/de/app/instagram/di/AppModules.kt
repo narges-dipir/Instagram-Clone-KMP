@@ -19,6 +19,8 @@ import de.app.instagram.profile.presentation.viewmodel.ProfileViewModel
 import de.app.instagram.reels.data.remote.KtorReelsApi
 import de.app.instagram.reels.data.remote.ReelsApi
 import de.app.instagram.reels.data.repository.DefaultReelsRepository
+import de.app.instagram.reels.data.local.FileReelInteractionStore
+import de.app.instagram.reels.data.local.ReelInteractionStore
 import de.app.instagram.reels.domain.repository.ReelsRepository
 import de.app.instagram.reels.domain.usecase.GetReelsPageUseCase
 import de.app.instagram.reels.presentation.viewmodel.ReelsViewModel
@@ -47,11 +49,12 @@ val networkModule = module {
     single<ReelsRepository> { DefaultReelsRepository(get()) }
     single<FeedRepository> { DefaultFeedRepository(get()) }
     single<PostInteractionStore> { FilePostInteractionStore(get()) }
+    single<ReelInteractionStore> { FileReelInteractionStore(get()) }
     factory { GetProfileUseCase(get()) }
     factory { GetReelsPageUseCase(get()) }
     factory { GetFeedPageUseCase(get()) }
     single { ProfileViewModel(get(), get(), get()) }
-    single { ReelsViewModel(get()) }
+    single { ReelsViewModel(get(), get()) }
     single { FeedViewModel(get()) }
 }
 

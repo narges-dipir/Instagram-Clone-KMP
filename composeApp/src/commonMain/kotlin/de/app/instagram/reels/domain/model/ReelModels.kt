@@ -8,6 +8,11 @@ data class ReelVideo(
     val avatarUrl: String,
     val likes: Int,
     val comments: Int,
+    val shares: Int = 0,
+    val isLikedByMe: Boolean = false,
+    val isSavedByMe: Boolean = false,
+    val isFollowingCreator: Boolean = false,
+    val recentComments: List<String> = emptyList(),
 )
 
 data class ReelsPage(
