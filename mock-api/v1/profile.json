@@ -32,18 +32,24 @@
     {
       "id": "p_001",
       "imageUrl": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-5s.mp4",
       "likes": 321,
       "comments": 18
     },
     {
       "id": "p_002",
       "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-10s.mp4",
       "likes": 210,
       "comments": 9
     },
     {
       "id": "p_003",
       "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-5s.mp4",
       "likes": 442,
       "comments": 34
     },
@@ -62,6 +68,8 @@
     {
       "id": "p_006",
       "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      "mediaType": "video",
+      "videoUrl": "https://download.samplelib.com/mp4/sample-10s.mp4",
       "likes": 390,
       "comments": 22
     }

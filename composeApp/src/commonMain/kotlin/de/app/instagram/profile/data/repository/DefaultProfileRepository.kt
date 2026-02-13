@@ -2,6 +2,7 @@ package de.app.instagram.profile.data.repository
 
 import de.app.instagram.profile.data.remote.ProfileApi
 import de.app.instagram.profile.domain.model.Profile
+import de.app.instagram.profile.domain.model.PostMediaType
 import de.app.instagram.profile.domain.model.ProfilePost
 import de.app.instagram.profile.domain.model.ProfileStats
 import de.app.instagram.profile.domain.model.StoryHighlight
@@ -36,6 +37,12 @@ class DefaultProfileRepository(
                 ProfilePost(
                     id = it.id,
                     imageUrl = it.imageUrl,
+                    mediaType = if (it.mediaType.equals("video", ignoreCase = true)) {
+                        PostMediaType.VIDEO
+                    } else {
+                        PostMediaType.IMAGE
+                    },
+                    videoUrl = it.videoUrl,
                     likes = it.likes,
                     comments = it.comments,
                 )

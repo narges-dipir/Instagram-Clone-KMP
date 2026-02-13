@@ -29,6 +29,17 @@ fun App() {
                 ProfileScreen(
                     uiState = uiState,
                     onRetryClick = viewModel::loadProfile,
+                    onStartEditing = viewModel::startEditing,
+                    onCancelEditing = viewModel::cancelEditing,
+                    onSaveProfile = viewModel::saveProfileChanges,
+                    onUsernameChange = viewModel::updateUsername,
+                    onFullNameChange = viewModel::updateFullName,
+                    onBioChange = viewModel::updateBio,
+                    onWebsiteChange = viewModel::updateWebsite,
+                    onPostClick = viewModel::openPost,
+                    onBackFromPost = viewModel::closePost,
+                    onToggleLikeClick = viewModel::toggleLikeForSelectedPost,
+                    onAddCommentClick = viewModel::addCommentToSelectedPost,
                 )
             }
         }

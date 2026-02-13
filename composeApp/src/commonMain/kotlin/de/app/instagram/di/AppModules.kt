@@ -2,6 +2,8 @@ package de.app.instagram.di
 
 import de.app.instagram.network.NetworkModule
 import de.app.instagram.network.createPlatformHttpClientEngine
+import de.app.instagram.profile.data.local.FilePostInteractionStore
+import de.app.instagram.profile.data.local.PostInteractionStore
 import de.app.instagram.profile.data.remote.KtorProfileApi
 import de.app.instagram.profile.data.remote.ProfileApi
 import de.app.instagram.profile.data.repository.DefaultProfileRepository
@@ -28,8 +30,9 @@ val networkModule = module {
     }
     single<ProfileApi> { KtorProfileApi(get()) }
     single<ProfileRepository> { DefaultProfileRepository(get()) }
+    single<PostInteractionStore> { FilePostInteractionStore(get()) }
     factory { GetProfileUseCase(get()) }
-    single { ProfileViewModel(get()) }
+    single { ProfileViewModel(get(), get()) }
 }
 
 val appModules = listOf(networkModule)

@@ -28,6 +28,15 @@ data class StoryHighlight(
 data class ProfilePost(
     val id: String,
     val imageUrl: String,
+    val mediaType: PostMediaType = PostMediaType.IMAGE,
+    val videoUrl: String? = null,
     val likes: Int,
     val comments: Int,
+    val isLikedByMe: Boolean = false,
+    val recentComments: List<String> = emptyList(),
 )
+
+enum class PostMediaType {
+    IMAGE,
+    VIDEO,
+}

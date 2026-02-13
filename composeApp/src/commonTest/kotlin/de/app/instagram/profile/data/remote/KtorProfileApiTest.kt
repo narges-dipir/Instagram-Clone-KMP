@@ -46,6 +46,8 @@ class KtorProfileApiTest {
                         {
                           "id": "p_001",
                           "imageUrl": "https://example.com/p1.jpg",
+                          "mediaType": "video",
+                          "videoUrl": "https://example.com/video.mp4",
                           "likes": 321,
                           "comments": 18
                         }
@@ -69,5 +71,7 @@ class KtorProfileApiTest {
         assertEquals(1, profile.storyHighlights.size)
         assertEquals(1, profile.posts.size)
         assertEquals("p_001", profile.posts.first().id)
+        assertEquals("video", profile.posts.first().mediaType)
+        assertEquals("https://example.com/video.mp4", profile.posts.first().videoUrl)
     }
 }
