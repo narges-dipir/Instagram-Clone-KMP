@@ -30,6 +30,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +42,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,19 +91,21 @@ fun App() {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 bottomBar = {
-                    NavigationBar {
-                        BottomTab.entries.forEach { tab ->
-                            NavigationBarItem(
-                                selected = selectedTab == tab,
-                                onClick = { selectedTab = tab },
-                                icon = {
-                                    Icon(
-                                        imageVector = tab.icon,
-                                        contentDescription = tab.label,
-                                    )
-                                },
-                                label = { Text(tab.label) },
-                            )
+                    if (selectedTab != BottomTab.Reels) {
+                        NavigationBar {
+                            BottomTab.entries.forEach { tab ->
+                                NavigationBarItem(
+                                    selected = selectedTab == tab,
+                                    onClick = { selectedTab = tab },
+                                    icon = {
+                                        Icon(
+                                            imageVector = tab.icon,
+                                            contentDescription = tab.label,
+                                        )
+                                    },
+                                    label = { Text(tab.label) },
+                                )
+                            }
                         }
                     }
                 },
@@ -214,10 +221,103 @@ private fun ReelsTabContent(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = 14.dp, end = 14.dp, bottom = 18.dp),
+                        .padding(start = 14.dp, end = 92.dp, bottom = 24.dp),
                 )
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 14.dp, end = 92.dp, bottom = 56.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AsyncImage(
+                        model = reel.avatarUrl,
+                        contentDescription = "Creator avatar",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(CircleShape),
+                    )
+                    Text(
+                        text = reel.username,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                    TextButton(onClick = {}) {
+                        Text(
+                            text = "Follow",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 8.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ReelAction(
+                        icon = Icons.Outlined.FavoriteBorder,
+                        label = formatCompactCount(reel.likes),
+                        contentDescription = "Like",
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ReelAction(
+                        icon = Icons.Outlined.ChatBubbleOutline,
+                        label = formatCompactCount(reel.comments),
+                        contentDescription = "Comment",
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ReelAction(
+                        icon = Icons.AutoMirrored.Outlined.Send,
+                        label = "Share",
+                        contentDescription = "Share",
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ReelAction(
+                        icon = Icons.Outlined.BookmarkBorder,
+                        label = "Save",
+                        contentDescription = "Save",
+                    )
+                }
             }
         }
+    }
+}
+
+private fun formatCompactCount(value: Int): String {
+    if (value >= 1000) {
+        val thousands = value / 1000
+        val remainderHundreds = (value % 1000) / 100
+        return if (thousands >= 10 || remainderHundreds == 0) {
+            "${thousands}k"
+        } else {
+            "${thousands}.${remainderHundreds}k"
+        }
+    }
+    return value.toString()
+}
+
+@Composable
+private fun ReelAction(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    contentDescription: String,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(28.dp),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
     }
 }
 

@@ -18,6 +18,10 @@ class DefaultReelsRepository(
                     id = it.id,
                     videoUrl = it.videoUrl,
                     caption = it.caption,
+                    username = it.username,
+                    avatarUrl = it.avatarUrl,
+                    likes = it.likes,
+                    comments = it.comments,
                 )
             },
         )

@@ -29,4 +29,8 @@ data class ReelVideoDto(
     val id: String,
     val videoUrl: String,
     val caption: String,
+    val username: String,
+    val avatarUrl: String,
+    val likes: Int,
+    val comments: Int,
 )

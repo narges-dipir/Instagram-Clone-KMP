@@ -5,32 +5,56 @@
     {
       "id": "r_007",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/StayAwayFromSugarySnacks.mp4",
-      "caption": "Midday energy without sugar crash"
+      "caption": "Midday energy without sugar crash",
+      "username": "eat.clean",
+      "avatarUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&q=80",
+      "likes": 7640,
+      "comments": 247
     },
     {
       "id": "r_008",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/noon/DontDrinkSodaWithYourFood.mp4",
-      "caption": "Choose water over soda with meals"
+      "caption": "Choose water over soda with meals",
+      "username": "meal.reset",
+      "avatarUrl": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=240&q=80",
+      "likes": 10870,
+      "comments": 402
     },
     {
       "id": "r_009",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/TwoWheelsFreeFitnessPureHappiness.mp4",
-      "caption": "Ride more, stress less"
+      "caption": "Ride more, stress less",
+      "username": "ride.happy",
+      "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80",
+      "likes": 14210,
+      "comments": 531
     },
     {
       "id": "r_010",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesUsFromBurnouts.mp4",
-      "caption": "Quick movement, better mood"
+      "caption": "Quick movement, better mood",
+      "username": "bonn.fit",
+      "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&q=80",
+      "likes": 11980,
+      "comments": 440
     },
     {
       "id": "r_011",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesYouFromBurnouts.mp4",
-      "caption": "Daily workout, burnout defense"
+      "caption": "Daily workout, burnout defense",
+      "username": "daily.move",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80",
+      "likes": 9880,
+      "comments": 325
     },
     {
       "id": "r_012",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/SugarIsNotAGoodSnack.mp4",
-      "caption": "Snack smart, not sweet"
+      "caption": "Snack smart, not sweet",
+      "username": "sugarfree.now",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&q=80",
+      "likes": 9340,
+      "comments": 310
     }
   ]
 }

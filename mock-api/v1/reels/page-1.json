@@ -5,32 +5,56 @@
     {
       "id": "r_001",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesUsFromBurnouts.mp4",
-      "caption": "A little workout saves us from burnouts"
+      "caption": "A little workout saves us from burnouts",
+      "username": "bonn.fit",
+      "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&q=80",
+      "likes": 12840,
+      "comments": 486
     },
     {
       "id": "r_002",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesYouFromBurnouts.mp4",
-      "caption": "A little workout saves you from burnouts"
+      "caption": "A little workout saves you from burnouts",
+      "username": "daily.move",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80",
+      "likes": 9320,
+      "comments": 301
     },
     {
       "id": "r_003",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/TwoWheelsFreeFitnessPureHappiness.mp4",
-      "caption": "Two wheels, free fitness, pure happiness"
+      "caption": "Two wheels, free fitness, pure happiness",
+      "username": "ride.happy",
+      "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80",
+      "likes": 17490,
+      "comments": 620
     },
     {
       "id": "r_004",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/StayAwayFromSugarySnacks.mp4",
-      "caption": "Stay away from sugary snacks"
+      "caption": "Stay away from sugary snacks",
+      "username": "eat.clean",
+      "avatarUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&q=80",
+      "likes": 8450,
+      "comments": 278
     },
     {
       "id": "r_005",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/SugarIsNotAGoodSnack.mp4",
-      "caption": "Sugar is not a good snack"
+      "caption": "Sugar is not a good snack",
+      "username": "sugarfree.now",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&q=80",
+      "likes": 10160,
+      "comments": 354
     },
     {
       "id": "r_006",
       "videoUrl": "https://fsn1.your-objectstorage.com/bunn/noon/DontDrinkSodaWithYourFood.mp4",
-      "caption": "Don't drink soda with your food"
+      "caption": "Don't drink soda with your food",
+      "username": "meal.reset",
+      "avatarUrl": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=240&q=80",
+      "likes": 11230,
+      "comments": 412
     }
   ]
 }
