@@ -13,6 +13,8 @@ sealed interface ProfileUiState {
         val editError: String?,
         val selectedPost: ProfilePost?,
         val selectedHighlight: StoryHighlight?,
+        val isLoadingMorePosts: Boolean = false,
+        val postsErrorMessage: String? = null,
     ) : ProfileUiState
     data class Error(val message: String) : ProfileUiState
 }

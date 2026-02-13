@@ -46,6 +46,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
@@ -73,6 +74,8 @@ import de.app.instagram.ui.PlatformVideoPlayer
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 private const val HIGHLIGHT_PAGE_DURATION_MS = 3200
@@ -94,6 +97,7 @@ fun ProfileScreen(
     onBackFromHighlight: () -> Unit,
     onToggleLikeClick: () -> Unit,
     onAddCommentClick: (String) -> Unit,
+    onLoadMorePosts: () -> Unit,
 ) {
     when (uiState) {
         ProfileUiState.Loading -> {
@@ -143,6 +147,9 @@ fun ProfileScreen(
                     onWebsiteChange = onWebsiteChange,
                     onPostClick = onPostClick,
                     onHighlightClick = onHighlightClick,
+                    isLoadingMorePosts = uiState.isLoadingMorePosts,
+                    postsErrorMessage = uiState.postsErrorMessage,
+                    onLoadMorePosts = onLoadMorePosts,
                 )
             }
         }
@@ -182,8 +189,25 @@ private fun ProfileContent(
     onWebsiteChange: (String) -> Unit,
     onPostClick: (ProfilePost) -> Unit,
     onHighlightClick: (StoryHighlight) -> Unit,
+    isLoadingMorePosts: Boolean,
+    postsErrorMessage: String?,
+    onLoadMorePosts: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    LaunchedEffect(scrollState, profile.posts.size, isLoadingMorePosts) {
+        snapshotFlow {
+            val threshold = (scrollState.maxValue - 220).coerceAtLeast(0)
+            scrollState.value >= threshold
+        }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect {
+                if (!isLoadingMorePosts) {
+                    onLoadMorePosts()
+                }
+            }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -305,6 +329,24 @@ private fun ProfileContent(
             posts = profile.posts,
             onPostClick = onPostClick,
         )
+        if (isLoadingMorePosts) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        if (!postsErrorMessage.isNullOrBlank()) {
+            Text(
+                text = postsErrorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 10.dp),
+            )
+        }
     }
 }
 

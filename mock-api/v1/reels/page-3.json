@@ -1,0 +1,60 @@
+{
+  "page": 3,
+  "hasNext": false,
+  "items": [
+    {
+      "id": "r_013",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/noon/DontDrinkSodaWithYourFood.mp4",
+      "caption": "No soda challenge",
+      "username": "meal.reset",
+      "avatarUrl": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=240&q=80",
+      "likes": 12110,
+      "comments": 468
+    },
+    {
+      "id": "r_014",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/TwoWheelsFreeFitnessPureHappiness.mp4",
+      "caption": "Cycling for happiness",
+      "username": "ride.happy",
+      "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80",
+      "likes": 15130,
+      "comments": 577
+    },
+    {
+      "id": "r_015",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/StayAwayFromSugarySnacks.mp4",
+      "caption": "Cut sugar, keep focus",
+      "username": "eat.clean",
+      "avatarUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&q=80",
+      "likes": 8220,
+      "comments": 266
+    },
+    {
+      "id": "r_016",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesUsFromBurnouts.mp4",
+      "caption": "Workout over burnout",
+      "username": "bonn.fit",
+      "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&q=80",
+      "likes": 12640,
+      "comments": 459
+    },
+    {
+      "id": "r_017",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/midday/SugarIsNotAGoodSnack.mp4",
+      "caption": "Healthy snack reminder",
+      "username": "sugarfree.now",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&q=80",
+      "likes": 9710,
+      "comments": 334
+    },
+    {
+      "id": "r_018",
+      "videoUrl": "https://fsn1.your-objectstorage.com/bunn/afternoon/ALittleWorkoutSavesYouFromBurnouts.mp4",
+      "caption": "Move today, recover better",
+      "username": "daily.move",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80",
+      "likes": 10430,
+      "comments": 349
+    }
+  ]
+}
