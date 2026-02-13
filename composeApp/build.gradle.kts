@@ -10,11 +10,7 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
+    androidTarget()
     
     listOf(
         iosArm64(),
@@ -30,9 +26,15 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.datasource)
             implementation(libs.androidx.media3.ui)
+            implementation(libs.firebase.messaging)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -103,3 +105,19 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
+
+val hasGoogleServicesConfig = listOf(
+    "google-services.json",
+    "src/debug/google-services.json",
+    "src/release/google-services.json",
+).any(::fileExists)
+
+if (hasGoogleServicesConfig) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.lifecycle(
+        "google-services.json not found in composeApp; skipping com.google.gms.google-services plugin.",
+    )
+}
+
+private fun fileExists(path: String): Boolean = file(path).exists()

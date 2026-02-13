@@ -20,6 +20,7 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
   - Android/iOS video playback
   - like and comment actions
   - local-only persistence for likes/comments (no server write)
+- Firebase push notification plumbing on Android + iOS (token + incoming event bridge to shared code)
 
 ## Data Source
 - App reads profile data from GitHub Pages JSON:
@@ -57,3 +58,21 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
 - Coil 3
 - Media3 (Android video)
 - AVPlayerViewController (iOS video)
+- Firebase Cloud Messaging (push)
+
+## Firebase Push Setup (Android + iOS)
+1. Create a Firebase project and add both apps:
+   - Android package: `de.app.instagram`
+   - iOS bundle ID: your `iosApp` bundle id from Xcode
+2. Android setup:
+   - Download `google-services.json`
+   - Place it at `composeApp/google-services.json`
+   - Build and run Android app, allow notification permission when prompted (Android 13+)
+3. iOS setup (Xcode):
+   - Add Firebase SDK packages (`FirebaseCore`, `FirebaseMessaging`) to `iosApp`
+   - Download `GoogleService-Info.plist` and add it to `iosApp/iosApp`
+   - Enable capabilities on app target:
+     - Push Notifications
+     - Background Modes -> Remote notifications
+   - Configure APNs key/certificate in Firebase Console (Cloud Messaging tab)
+4. Send a test push from Firebase Console to verify device token registration and delivery.

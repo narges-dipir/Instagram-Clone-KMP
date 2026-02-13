@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
@@ -21,8 +22,12 @@ actual fun PlatformVideoPlayer(
 ) {
     val context = LocalContext.current
     val player = remember(videoUrl) {
+        val mediaSource = ProgressiveMediaSource.Factory(
+            AndroidVideoCache.createDataSourceFactory(context),
+        ).createMediaSource(MediaItem.fromUri(videoUrl))
+
         ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(videoUrl))
+            setMediaSource(mediaSource)
             repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
             volume = if (isMuted) 0f else 1f

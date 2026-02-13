@@ -8,6 +8,8 @@ import androidx.compose.ui.interop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVKit.AVPlayerViewController
 import platform.AVFoundation.AVPlayer
+import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVURLAsset
 import platform.Foundation.NSURL
 import platform.UIKit.UIView
 
@@ -19,10 +21,14 @@ actual fun PlatformVideoPlayer(
     modifier: Modifier,
 ) {
     val muteState = isMuted
-    val player = remember(videoUrl) {
+    val playerItem = remember(videoUrl) {
         NSURL.URLWithString(videoUrl)?.let { url ->
-            AVPlayer(uRL = url)
+            val asset = AVURLAsset(uRL = url, options = null)
+            AVPlayerItem(asset = asset)
         }
+    }
+    val player = remember(playerItem) {
+        playerItem?.let { AVPlayer(playerItem = it) }
     }
     val controller = remember(player) {
         AVPlayerViewController().apply {

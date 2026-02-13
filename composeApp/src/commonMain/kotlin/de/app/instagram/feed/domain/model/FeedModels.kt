@@ -10,6 +10,8 @@ data class FeedPost(
     val likes: Int,
     val comments: Int,
     val caption: String,
+    val isLikedByMe: Boolean = false,
+    val isSavedByMe: Boolean = false,
 )
 
 enum class FeedMediaType {

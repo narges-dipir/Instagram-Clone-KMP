@@ -5,6 +5,8 @@ import de.app.instagram.network.createPlatformHttpClientEngine
 import de.app.instagram.feed.data.remote.FeedApi
 import de.app.instagram.feed.data.remote.KtorFeedApi
 import de.app.instagram.feed.data.repository.DefaultFeedRepository
+import de.app.instagram.feed.data.local.FeedInteractionStore
+import de.app.instagram.feed.data.local.FileFeedInteractionStore
 import de.app.instagram.feed.domain.repository.FeedRepository
 import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
 import de.app.instagram.feed.presentation.viewmodel.FeedViewModel
@@ -50,12 +52,13 @@ val networkModule = module {
     single<FeedRepository> { DefaultFeedRepository(get()) }
     single<PostInteractionStore> { FilePostInteractionStore(get()) }
     single<ReelInteractionStore> { FileReelInteractionStore(get()) }
+    single<FeedInteractionStore> { FileFeedInteractionStore(get()) }
     factory { GetProfileUseCase(get()) }
     factory { GetReelsPageUseCase(get()) }
     factory { GetFeedPageUseCase(get()) }
     single { ProfileViewModel(get(), get(), get()) }
     single { ReelsViewModel(get(), get()) }
-    single { FeedViewModel(get()) }
+    single { FeedViewModel(get(), get()) }
 }
 
 val appModules = listOf(networkModule)
