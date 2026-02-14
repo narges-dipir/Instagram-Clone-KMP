@@ -4,11 +4,10 @@ import de.app.instagram.reels.domain.usecase.GetReelsPageUseCase
 import de.app.instagram.reels.data.local.InMemoryReelInteractionStore
 import de.app.instagram.reels.data.local.LocalReelInteraction
 import de.app.instagram.reels.data.local.ReelInteractionStore
+import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.reels.domain.model.ReelVideo
 import de.app.instagram.reels.presentation.state.ReelsUiState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +17,7 @@ import kotlinx.coroutines.launch
 class ReelsViewModel(
     private val getReelsPageUseCase: GetReelsPageUseCase,
     private val reelInteractionStore: ReelInteractionStore = InMemoryReelInteractionStore(),
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    private val scope: CoroutineScope = createDefaultAppScope(),
 ) {
     private val _uiState = MutableStateFlow(ReelsUiState())
     val uiState: StateFlow<ReelsUiState> = _uiState.asStateFlow()
@@ -75,6 +74,7 @@ class ReelsViewModel(
                     isLoadingMore = false,
                     errorMessage = null,
                 )
+                seedMissingInteractions(pageData.items.map { it.id }, localInteractions)
             } catch (t: Throwable) {
                 _uiState.value = previousState.copy(
                     isInitialLoading = false,
@@ -184,4 +184,15 @@ class ReelsViewModel(
     }
 
     private fun baseReelId(reelId: String): String = reelId.substringBefore("_r")
+
+    private suspend fun seedMissingInteractions(
+        reelIds: List<String>,
+        existing: Map<String, LocalReelInteraction>,
+    ) {
+        val missing = reelIds.map(::baseReelId).distinct().filterNot(existing::containsKey)
+        if (missing.isEmpty()) return
+        missing.forEach { id ->
+            reelInteractionStore.save(reelId = id, interaction = LocalReelInteraction())
+        }
+    }
 }

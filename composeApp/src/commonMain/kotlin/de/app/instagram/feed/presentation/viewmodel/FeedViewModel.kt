@@ -3,12 +3,11 @@ package de.app.instagram.feed.presentation.viewmodel
 import de.app.instagram.feed.data.local.FeedInteractionStore
 import de.app.instagram.feed.data.local.InMemoryFeedInteractionStore
 import de.app.instagram.feed.data.local.LocalFeedInteraction
+import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.feed.domain.model.FeedPost
 import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
 import de.app.instagram.feed.presentation.state.FeedUiState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,9 +17,8 @@ import kotlinx.coroutines.launch
 class FeedViewModel(
     private val getFeedPageUseCase: GetFeedPageUseCase,
     private val feedInteractionStore: FeedInteractionStore = InMemoryFeedInteractionStore(),
+    private val scope: CoroutineScope = createDefaultAppScope(),
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
 
@@ -49,7 +47,7 @@ class FeedViewModel(
                     val localInteractions = feedInteractionStore.readAll()
                     val isLoopStart = !pageData.hasNext
                     val pageItemsWithRound = pageData.items.map { post ->
-                        val local = localInteractions[post.id]
+                        val local = localInteractions[basePostId(post.id)]
                         post.copy(
                             id = "${post.id}_r$loopRound",
                             likes = post.likes + if (local?.isLikedByMe == true) 1 else 0,
@@ -67,6 +65,7 @@ class FeedViewModel(
                             errorMessage = null,
                         )
                     }
+                    seedMissingInteractions(pageData.items.map { it.id }, localInteractions)
 
                     if (isLoopStart) {
                         nextPage = 1
@@ -153,4 +152,15 @@ class FeedViewModel(
     }
 
     private fun basePostId(postId: String): String = postId.substringBefore("_r")
+
+    private suspend fun seedMissingInteractions(
+        postIds: List<String>,
+        existing: Map<String, LocalFeedInteraction>,
+    ) {
+        val missing = postIds.map(::basePostId).distinct().filterNot(existing::containsKey)
+        if (missing.isEmpty()) return
+        missing.forEach { id ->
+            feedInteractionStore.save(postId = id, interaction = LocalFeedInteraction())
+        }
+    }
 }

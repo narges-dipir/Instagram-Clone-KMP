@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -35,6 +36,7 @@ kotlin {
             implementation(libs.androidx.media3.datasource)
             implementation(libs.androidx.media3.ui)
             implementation(libs.firebase.messaging)
+            implementation(libs.sqldelight.android.driver)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -55,9 +57,11 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.okio)
+            implementation(libs.sqldelight.runtime)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -71,6 +75,14 @@ kotlin {
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation("androidx.compose.ui:ui-test-junit4-android:1.7.8")
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("InstagramCacheDatabase") {
+            packageName.set("de.app.instagram.db")
         }
     }
 }
@@ -94,6 +106,12 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
         }
     }
     compileOptions {

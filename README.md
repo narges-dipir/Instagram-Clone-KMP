@@ -50,6 +50,52 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
 ./gradlew :composeApp:testDebugUnitTest
 ```
 
+## Benchmark Manual
+### Prerequisites
+1. Connect a physical Android device (recommended for macrobenchmarks).
+2. Enable in Developer Options:
+   - `USB debugging`
+   - `Install via USB`
+   - `USB debugging (Security settings)` (if your ROM shows it)
+3. Keep the phone unlocked while benchmarks install/run.
+
+### Main Commands
+1. Run robustness benchmark and export metrics to a stable text report:
+```bash
+./gradlew :benchmark:runInstalledRobustnessWithMetrics
+```
+2. Open the latest robustness metrics:
+```bash
+open benchmark/build/reports/androidTests/connected/benchmark/robustness-metrics-latest.txt
+```
+3. Run connected benchmark suite (Gradle HTML report flow):
+```bash
+./gradlew :benchmark:connectedBenchmarkAndroidTest
+```
+4. Open Gradle connected test report:
+```bash
+open benchmark/build/reports/androidTests/connected/benchmark/index.html
+```
+
+### Output Files
+- Robustness metrics text report (recommended source of truth):
+  - `benchmark/build/reports/androidTests/connected/benchmark/robustness-metrics-latest.txt`
+- Archived robustness reports:
+  - `benchmark/build/reports/androidTests/connected/benchmark/robustness-metrics-YYYYMMDD-HHMMSS.txt`
+- Gradle connected benchmark HTML:
+  - `benchmark/build/reports/androidTests/connected/benchmark/index.html`
+
+### Troubleshooting
+1. `INSTALL_FAILED_USER_RESTRICTED`
+   - Cause: device blocked ADB app install.
+   - Fix: enable `Install via USB`, approve on-device prompts, keep device unlocked, rerun benchmark.
+2. `DEBUGGABLE` in macrobenchmark
+   - Cause: wrong tested variant/task.
+   - Fix: run `:benchmark:connectedBenchmarkAndroidTest` (benchmark variant), not debug Android test task.
+3. `index.html` shows `0 tests` but benchmarks ran
+   - Cause: HTML report reflects a failed Gradle install session.
+   - Fix: use `robustness-metrics-latest.txt` for actual run metrics.
+
 ## Tech Stack
 - Kotlin Multiplatform
 - Compose Multiplatform

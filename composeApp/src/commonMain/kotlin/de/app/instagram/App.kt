@@ -96,6 +96,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
+import kotlin.math.abs
 
 private const val HOME_STORIES_COUNT = 10
 private val HOME_TOP_BAR_HEIGHT = 56.dp
@@ -280,9 +281,20 @@ private fun ReelsTabContent(
 
         VerticalPager(
             state = pagerState,
+            beyondViewportPageCount = 1,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
             val reel = reels[page]
+            val distanceToCurrent = abs(page - pagerState.currentPage)
+            val distanceToTarget = abs(page - pagerState.targetPage)
+            val isActiveReel = distanceToCurrent <= 1 || distanceToTarget <= 1
+            val shouldPlay = page == pagerState.currentPage || page == pagerState.targetPage
+            val shouldPlayWithAudio = if (pagerState.targetPage != pagerState.settledPage) {
+                // Once pager commits to the next reel (around midpoint), move audio to it.
+                page == pagerState.targetPage
+            } else {
+                page == pagerState.settledPage
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -290,7 +302,9 @@ private fun ReelsTabContent(
             ) {
                 PlatformVideoPlayer(
                     videoUrl = reel.videoUrl,
-                    isMuted = true,
+                    isMuted = !shouldPlayWithAudio,
+                    isActive = isActiveReel,
+                    shouldPlay = shouldPlay,
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(),
