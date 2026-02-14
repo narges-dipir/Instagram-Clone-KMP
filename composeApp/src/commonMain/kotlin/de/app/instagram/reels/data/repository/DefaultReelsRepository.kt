@@ -8,6 +8,15 @@ import de.app.instagram.reels.domain.repository.ReelsRepository
 class DefaultReelsRepository(
     private val api: ReelsApi,
 ) : ReelsRepository {
+    private val fallbackUrls = listOf(
+        "https://download.samplelib.com/mp4/sample-5s.mp4",
+        "https://download.samplelib.com/mp4/sample-10s.mp4",
+        "https://download.samplelib.com/mp4/sample-5s.mp4",
+        "https://download.samplelib.com/mp4/sample-10s.mp4",
+        "https://download.samplelib.com/mp4/sample-5s.mp4",
+        "https://download.samplelib.com/mp4/sample-10s.mp4",
+    )
+
     override suspend fun getPage(page: Int): ReelsPage {
         val dto = api.getPage(page)
         return ReelsPage(
@@ -16,7 +25,7 @@ class DefaultReelsRepository(
             items = dto.items.map {
                 ReelVideo(
                     id = it.id,
-                    videoUrl = it.videoUrl,
+                    videoUrl = resolvePlayableVideoUrl(it.id, it.videoUrl),
                     caption = it.caption,
                     username = it.username,
                     avatarUrl = it.avatarUrl,
@@ -25,5 +34,14 @@ class DefaultReelsRepository(
                 )
             },
         )
+    }
+
+    private fun resolvePlayableVideoUrl(id: String, url: String): String {
+        val normalized = url.trim()
+        if (normalized.startsWith("https://") || normalized.startsWith("http://")) {
+            return normalized
+        }
+        val index = (id.hashCode() and Int.MAX_VALUE) % fallbackUrls.size
+        return fallbackUrls[index]
     }
 }

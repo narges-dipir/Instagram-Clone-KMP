@@ -4,19 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.AVKit.AVPlayerViewController
+import kotlinx.cinterop.readValue
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
-import platform.AVFoundation.AVURLAsset
+import platform.AVFoundation.AVPlayerLayer
+import platform.AVFoundation.AVPlayerItemFailedToPlayToEndTimeNotification
+import platform.CoreGraphics.CGRectZero
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSURL
+import platform.UIKit.UIColor
 import platform.UIKit.UIView
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalComposeUiApi::class)
 @Composable
 actual fun PlatformVideoPlayer(
     videoUrl: String,
@@ -30,39 +37,65 @@ actual fun PlatformVideoPlayer(
         return
     }
 
-    val muteState = isMuted
-    val playerItem = remember(videoUrl) {
-        NSURL.URLWithString(videoUrl)?.let { url ->
-            val asset = AVURLAsset(uRL = url, options = null)
-            AVPlayerItem(asset = asset)
+    val player = remember { AVPlayer() }
+    val playerLayer = remember { AVPlayerLayer.playerLayerWithPlayer(player) }
+
+    LaunchedEffect(videoUrl) {
+        val item = NSURL.URLWithString(videoUrl)?.let { AVPlayerItem(uRL = it) }
+        player.performSelector(
+            NSSelectorFromString("replaceCurrentItemWithPlayerItem:"),
+            withObject = item,
+        )
+        if (shouldPlay) {
+            player.performSelector(NSSelectorFromString("play"))
+        }
+        println("PlatformVideoPlayer(iOS): loaded URL=$videoUrl itemNull=${item == null}")
+    }
+
+    LaunchedEffect(shouldPlay) {
+        if (shouldPlay) {
+            player.performSelector(NSSelectorFromString("play"))
+        } else {
+            player.performSelector(NSSelectorFromString("pause"))
         }
     }
-    val player = remember(playerItem) {
-        playerItem?.let { AVPlayer(playerItem = it) }
-    }
-    val controller = remember(player) {
-        AVPlayerViewController().apply {
-            this.player = player
-            this.showsPlaybackControls = false
-        }
+
+    LaunchedEffect(isMuted) {
+        // setMuted/setVolume bindings are not available in this Kotlin/Native setup.
     }
 
     UIKitView(
         modifier = modifier,
         factory = {
-            controller.view
-        },
-        update = { view: UIView ->
-            if (muteState) {
-                // Mute control is not currently exposed in this AVPlayer interop surface.
+            UIView(frame = CGRectZero.readValue()).apply {
+                backgroundColor = UIColor.blackColor
+                layer.addSublayer(playerLayer)
             }
+        },
+        update = { view ->
+            playerLayer.frame = view.bounds
             view.setNeedsLayout()
+            view.layoutIfNeeded()
         },
     )
 
     DisposableEffect(player) {
+        val failureObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVPlayerItemFailedToPlayToEndTimeNotification,
+            `object` = null,
+            queue = null,
+        ) { notification ->
+            println("PlatformVideoPlayer(iOS): failedToPlayToEnd userInfo=${notification?.userInfo}")
+        }
+
         onDispose {
-            // AVPlayerViewController handles player lifecycle with its view.
+            player.performSelector(NSSelectorFromString("pause"))
+            player.performSelector(
+                NSSelectorFromString("replaceCurrentItemWithPlayerItem:"),
+                withObject = null,
+            )
+            playerLayer.removeFromSuperlayer()
+            NSNotificationCenter.defaultCenter.removeObserver(failureObserver)
         }
     }
 }
