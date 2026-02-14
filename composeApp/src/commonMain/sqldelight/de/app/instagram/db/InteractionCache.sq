@@ -1,0 +1,86 @@
+CREATE TABLE feed_interaction (
+  post_id TEXT NOT NULL PRIMARY KEY,
+  is_liked_by_me INTEGER NOT NULL DEFAULT 0,
+  is_saved_by_me INTEGER NOT NULL DEFAULT 0,
+  local_comments INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE reel_interaction (
+  reel_id TEXT NOT NULL PRIMARY KEY,
+  is_liked_by_me INTEGER NOT NULL DEFAULT 0,
+  is_saved_by_me INTEGER NOT NULL DEFAULT 0,
+  is_following_creator INTEGER NOT NULL DEFAULT 0,
+  comments_json TEXT NOT NULL DEFAULT '[]',
+  local_shares INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE post_interaction (
+  post_id TEXT NOT NULL PRIMARY KEY,
+  is_liked_by_me INTEGER NOT NULL DEFAULT 0,
+  comments_json TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE TABLE app_meta (
+  key TEXT NOT NULL PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+selectAllFeed:
+SELECT post_id, is_liked_by_me, is_saved_by_me, local_comments
+FROM feed_interaction;
+
+countFeed:
+SELECT COUNT(*) FROM feed_interaction;
+
+upsertFeed:
+INSERT OR REPLACE INTO feed_interaction(
+  post_id,
+  is_liked_by_me,
+  is_saved_by_me,
+  local_comments
+)
+VALUES (?, ?, ?, ?);
+
+selectAllReels:
+SELECT reel_id, is_liked_by_me, is_saved_by_me, is_following_creator, comments_json, local_shares
+FROM reel_interaction;
+
+countReels:
+SELECT COUNT(*) FROM reel_interaction;
+
+upsertReel:
+INSERT OR REPLACE INTO reel_interaction(
+  reel_id,
+  is_liked_by_me,
+  is_saved_by_me,
+  is_following_creator,
+  comments_json,
+  local_shares
+)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectAllPosts:
+SELECT post_id, is_liked_by_me, comments_json
+FROM post_interaction;
+
+countPosts:
+SELECT COUNT(*) FROM post_interaction;
+
+upsertPost:
+INSERT OR REPLACE INTO post_interaction(
+  post_id,
+  is_liked_by_me,
+  comments_json
+)
+VALUES (?, ?, ?);
+
+selectMetaValue:
+SELECT value FROM app_meta
+WHERE key = ?;
+
+upsertMetaValue:
+INSERT OR REPLACE INTO app_meta(
+  key,
+  value
+)
+VALUES (?, ?);
