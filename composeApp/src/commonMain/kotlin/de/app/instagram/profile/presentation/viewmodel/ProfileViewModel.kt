@@ -3,6 +3,7 @@ package de.app.instagram.profile.presentation.viewmodel
 import de.app.instagram.profile.data.local.InMemoryPostInteractionStore
 import de.app.instagram.profile.data.local.LocalPostInteraction
 import de.app.instagram.profile.data.local.PostInteractionStore
+import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.feed.domain.model.FeedMediaType
 import de.app.instagram.feed.domain.model.FeedPost
 import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
@@ -13,8 +14,6 @@ import de.app.instagram.profile.domain.model.StoryHighlight
 import de.app.instagram.profile.presentation.state.EditProfileDraft
 import de.app.instagram.profile.presentation.state.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,7 @@ class ProfileViewModel(
     private val getProfileUseCase: GetProfileUseCase,
     private val getFeedPageUseCase: GetFeedPageUseCase,
     private val postInteractionStore: PostInteractionStore = InMemoryPostInteractionStore(),
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    private val scope: CoroutineScope = createDefaultAppScope(),
 ) {
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -56,7 +55,7 @@ class ProfileViewModel(
                 ProfileUiState.Success(
                     profile = profile.copy(
                         posts = mappedInitialPosts.map { post ->
-                            val local = localInteractions[post.id]
+                            val local = localInteractions[basePostId(post.id)]
                             if (local == null) {
                                 post
                             } else {
@@ -83,6 +82,13 @@ class ProfileViewModel(
                 )
             } catch (throwable: Throwable) {
                 ProfileUiState.Error(throwable.message ?: "Failed to load profile")
+            }
+            val latest = _uiState.value as? ProfileUiState.Success
+            if (latest != null) {
+                seedMissingInteractions(
+                    postIds = latest.profile.posts.map { it.id },
+                    existing = postInteractionStore.readAll(),
+                )
             }
         }
     }
@@ -189,7 +195,7 @@ class ProfileViewModel(
                     val loadedPosts = pageData.items
                         .mapToProfilePosts(postsLoopRound)
                         .map { post ->
-                            val local = localInteractions[post.id]
+                            val local = localInteractions[basePostId(post.id)]
                             if (local == null) {
                                 post
                             } else {
@@ -211,6 +217,10 @@ class ProfileViewModel(
                         ),
                         isLoadingMorePosts = false,
                         postsErrorMessage = null,
+                    )
+                    seedMissingInteractions(
+                        postIds = loadedPosts.map { it.id },
+                        existing = localInteractions,
                     )
 
                     if (pageData.hasNext) {
@@ -305,7 +315,7 @@ class ProfileViewModel(
 
         scope.launch {
             postInteractionStore.save(
-                postId = updatedPost.id,
+                postId = basePostId(updatedPost.id),
                 interaction = LocalPostInteraction(
                     isLikedByMe = updatedPost.isLikedByMe,
                     comments = updatedPost.recentComments,
@@ -328,6 +338,19 @@ class ProfileViewModel(
                 likes = feedPost.likes,
                 comments = feedPost.comments,
             )
+        }
+    }
+
+    private fun basePostId(postId: String): String = postId.substringBefore("_r")
+
+    private suspend fun seedMissingInteractions(
+        postIds: List<String>,
+        existing: Map<String, LocalPostInteraction>,
+    ) {
+        val missing = postIds.map(::basePostId).distinct().filterNot(existing::containsKey)
+        if (missing.isEmpty()) return
+        missing.forEach { id ->
+            postInteractionStore.save(postId = id, interaction = LocalPostInteraction())
         }
     }
 }

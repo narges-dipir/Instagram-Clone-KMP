@@ -1,8 +1,16 @@
 package de.app.instagram.reels.data.local
 
+import de.app.instagram.di.CoroutineDispatchers
+import de.app.instagram.di.DefaultCoroutineDispatchers
+import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.storage.reelInteractionsStoragePath
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okio.FileSystem
@@ -13,27 +21,56 @@ class FileReelInteractionStore(
     private val json: Json,
     private val fileSystem: FileSystem = FileSystem.SYSTEM,
     private val filePath: Path = reelInteractionsStoragePath().toPath(),
+    private val dispatchers: CoroutineDispatchers = DefaultCoroutineDispatchers,
+    private val scope: CoroutineScope = createDefaultAppScope(dispatchers),
 ) : ReelInteractionStore {
     private val mutex = Mutex()
+    private var flushJob: Job? = null
+    private var cacheLoaded = false
+    private val cache = mutableMapOf<String, LocalReelInteraction>()
 
     override suspend fun readAll(): Map<String, LocalReelInteraction> = mutex.withLock {
-        readAllInternal()
+        ensureLoadedLocked()
+        cache.toMap()
     }
 
     override suspend fun save(reelId: String, interaction: LocalReelInteraction) {
         mutex.withLock {
-            val current = readAllInternal().toMutableMap()
-            current[reelId] = interaction
-            writeAllInternal(current)
+            ensureLoadedLocked()
+            cache[reelId] = interaction
+            scheduleFlushLocked()
         }
     }
 
-    private fun readAllInternal(): Map<String, LocalReelInteraction> {
-        if (!fileSystem.exists(filePath)) return emptyMap()
-        val raw = fileSystem.read(filePath) { readUtf8() }
-        if (raw.isBlank()) return emptyMap()
+    private suspend fun ensureLoadedLocked() {
+        if (cacheLoaded) return
+        cache.clear()
+        cache.putAll(readAllInternal())
+        cacheLoaded = true
+    }
 
-        return runCatching {
+    private fun scheduleFlushLocked() {
+        flushJob?.cancel()
+        flushJob = scope.launch {
+            delay(WRITE_DEBOUNCE_MS)
+            flushToDisk()
+        }
+    }
+
+    private suspend fun flushToDisk() {
+        val snapshot = mutex.withLock {
+            if (!cacheLoaded) return
+            cache.toMap()
+        }
+        writeAllInternal(snapshot)
+    }
+
+    private suspend fun readAllInternal(): Map<String, LocalReelInteraction> = withContext(dispatchers.io) {
+        if (!fileSystem.exists(filePath)) return@withContext emptyMap()
+        val raw = fileSystem.read(filePath) { readUtf8() }
+        if (raw.isBlank()) return@withContext emptyMap()
+
+        runCatching {
             val payload = json.decodeFromString<LocalReelInteractionsPayload>(raw)
             payload.items.mapValues { (_, value) ->
                 LocalReelInteraction(
@@ -47,22 +84,24 @@ class FileReelInteractionStore(
         }.getOrDefault(emptyMap())
     }
 
-    private fun writeAllInternal(data: Map<String, LocalReelInteraction>) {
-        filePath.parent?.let(fileSystem::createDirectories)
-        val payload = LocalReelInteractionsPayload(
-            items = data.mapValues { (_, value) ->
-                LocalReelInteractionDto(
-                    isLikedByMe = value.isLikedByMe,
-                    isSavedByMe = value.isSavedByMe,
-                    isFollowingCreator = value.isFollowingCreator,
-                    comments = value.comments,
-                    localShares = value.localShares,
-                )
-            },
-        )
-        val encoded = json.encodeToString(LocalReelInteractionsPayload.serializer(), payload)
-        fileSystem.write(filePath) {
-            writeUtf8(encoded)
+    private suspend fun writeAllInternal(data: Map<String, LocalReelInteraction>) {
+        withContext(dispatchers.io) {
+            filePath.parent?.let(fileSystem::createDirectories)
+            val payload = LocalReelInteractionsPayload(
+                items = data.mapValues { (_, value) ->
+                    LocalReelInteractionDto(
+                        isLikedByMe = value.isLikedByMe,
+                        isSavedByMe = value.isSavedByMe,
+                        isFollowingCreator = value.isFollowingCreator,
+                        comments = value.comments,
+                        localShares = value.localShares,
+                    )
+                },
+            )
+            val encoded = json.encodeToString(LocalReelInteractionsPayload.serializer(), payload)
+            fileSystem.write(filePath) {
+                writeUtf8(encoded)
+            }
         }
     }
 }
@@ -80,3 +119,5 @@ private data class LocalReelInteractionDto(
     val comments: List<String> = emptyList(),
     val localShares: Int = 0,
 )
+
+private const val WRITE_DEBOUNCE_MS: Long = 750L

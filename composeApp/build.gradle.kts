@@ -7,14 +7,11 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
+    androidTarget()
     
     listOf(
         iosArm64(),
@@ -30,9 +27,16 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.datasource)
             implementation(libs.androidx.media3.ui)
+            implementation(libs.firebase.messaging)
+            implementation(libs.sqldelight.android.driver)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -53,9 +57,11 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.okio)
+            implementation(libs.sqldelight.runtime)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -69,6 +75,14 @@ kotlin {
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.espresso.core)
             implementation("androidx.compose.ui:ui-test-junit4-android:1.7.8")
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("InstagramCacheDatabase") {
+            packageName.set("de.app.instagram.db")
         }
     }
 }
@@ -93,6 +107,12 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -103,3 +123,19 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
+
+val hasGoogleServicesConfig = listOf(
+    "google-services.json",
+    "src/debug/google-services.json",
+    "src/release/google-services.json",
+).any(::fileExists)
+
+if (hasGoogleServicesConfig) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.lifecycle(
+        "google-services.json not found in composeApp; skipping com.google.gms.google-services plugin.",
+    )
+}
+
+private fun fileExists(path: String): Boolean = file(path).exists()
