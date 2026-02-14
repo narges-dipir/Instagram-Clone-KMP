@@ -4,7 +4,17 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
 
 ## Preview
 <p align="center">
-  <img src="docs/images/profile-preview.png" alt="Profile screen preview" width="280" />
+  <img src="docs/images/home_screen.jpg" alt="Home screen" width="220" />
+  <img src="docs/images/explore_screen.jpg" alt="Explore screen" width="220" />
+  <img src="docs/images/reels_screen.jpg" alt="Reels screen" width="220" />
+  <img src="docs/images/profile_screen.jpg" alt="Profile screen" width="220" />
+</p>
+
+<p align="center">
+  <video src="docs/images/VID_20260214_155312.mp4" width="320" controls></video>
+</p>
+<p align="center">
+  <a href="docs/images/VID_20260214_155312.mp4">Open flow recording</a>
 </p>
 
 ## Features

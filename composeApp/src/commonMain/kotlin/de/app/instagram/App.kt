@@ -75,6 +75,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -517,10 +519,12 @@ private fun HomeTabContent(
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
+    val density = LocalDensity.current
     val posts = uiState.items
     val stories = remember(posts) { buildHomeStories(posts) }
     var previousScrollPosition by remember { mutableStateOf(0) }
     var selectedStoryIndex by remember { mutableStateOf<Int?>(null) }
+    var homeTopBarHeight by remember { mutableStateOf(HOME_TOP_BAR_HEIGHT) }
 
     if (uiState.isInitialLoading && posts.isEmpty()) {
         Box(
@@ -573,7 +577,7 @@ private fun HomeTabContent(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = HOME_TOP_BAR_HEIGHT),
+                .padding(top = homeTopBarHeight),
         ) {
             item {
                 HomeStoriesRow(
@@ -613,6 +617,12 @@ private fun HomeTabContent(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(top = 6.dp),
+            onHeightMeasured = { measuredHeightPx ->
+                val measuredHeightDp = with(density) { measuredHeightPx.toDp() }
+                if (measuredHeightDp != homeTopBarHeight) {
+                    homeTopBarHeight = measuredHeightDp
+                }
+            },
         )
 
         val storyIndex = selectedStoryIndex
@@ -744,12 +754,16 @@ private fun HomeTabContent(
 }
 
 @Composable
-private fun HomeTopBar(modifier: Modifier = Modifier) {
+private fun HomeTopBar(
+    modifier: Modifier = Modifier,
+    onHeightMeasured: (Int) -> Unit = {},
+) {
     var likesNotifications by remember { mutableStateOf(7) }
     var messageNotifications by remember { mutableStateOf(3) }
 
     Row(
         modifier = modifier
+            .onSizeChanged { onHeightMeasured(it.height) }
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
