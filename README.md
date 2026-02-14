@@ -11,10 +11,12 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
 </p>
 
 <p align="center">
-  <video src="docs/images/VID_20260214_155312.mp4" width="320" controls></video>
+  <a href="docs/images/VID_20260214_155312.mp4">
+    <img src="docs/images/reels_screen.jpg" alt="Open flow recording (MP4)" width="320" />
+  </a>
 </p>
 <p align="center">
-  <a href="docs/images/VID_20260214_155312.mp4">Open flow recording</a>
+  <a href="docs/images/VID_20260214_155312.mp4">Download / open flow recording (MP4)</a>
 </p>
 
 ## Features
