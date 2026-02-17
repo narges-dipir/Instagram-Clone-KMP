@@ -7,6 +7,8 @@ import de.app.instagram.storage.feedInteractionsStoragePath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -28,6 +30,9 @@ class FileFeedInteractionStore(
     private var flushJob: Job? = null
     private var cacheLoaded = false
     private val cache = mutableMapOf<String, LocalFeedInteraction>()
+    private val state = MutableStateFlow<Map<String, LocalFeedInteraction>>(emptyMap())
+
+    override fun observeAll(): Flow<Map<String, LocalFeedInteraction>> = state
 
     override suspend fun readAll(): Map<String, LocalFeedInteraction> = mutex.withLock {
         ensureLoadedLocked()
@@ -38,6 +43,7 @@ class FileFeedInteractionStore(
         mutex.withLock {
             ensureLoadedLocked()
             cache[postId] = interaction
+            state.value = cache.toMap()
             scheduleFlushLocked()
         }
     }
@@ -47,6 +53,7 @@ class FileFeedInteractionStore(
         cache.clear()
         cache.putAll(readAllInternal())
         cacheLoaded = true
+        state.value = cache.toMap()
     }
 
     private fun scheduleFlushLocked() {

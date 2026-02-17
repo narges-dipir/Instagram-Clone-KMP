@@ -1,7 +1,8 @@
 package de.app.instagram.di
 
 import de.app.instagram.db.InstagramCacheDatabase
-import de.app.instagram.db.LegacyJsonCacheMigrator
+import de.app.instagram.db.RemoteContentCache
+import de.app.instagram.db.SqlDelightRemoteContentCache
 import de.app.instagram.db.createDatabaseDriver
 import de.app.instagram.network.NetworkModule
 import de.app.instagram.network.createPlatformHttpClientEngine
@@ -53,17 +54,21 @@ val networkModule = module {
         )
     }
     single { InstagramCacheDatabase(createDatabaseDriver()) }
-    single { LegacyJsonCacheMigrator(database = get(), json = get(), dispatchers = get()) }
+    single<RemoteContentCache> {
+        SqlDelightRemoteContentCache(
+            database = get(),
+            dispatchers = get(),
+        )
+    }
     single<ProfileApi> { KtorProfileApi(get()) }
     single<ReelsApi> { KtorReelsApi(get()) }
     single<FeedApi> { KtorFeedApi(get()) }
-    single<ProfileRepository> { DefaultProfileRepository(get()) }
-    single<ReelsRepository> { DefaultReelsRepository(get()) }
-    single<FeedRepository> { DefaultFeedRepository(get()) }
+    single<ProfileRepository> { DefaultProfileRepository(get(), get(), get()) }
+    single<ReelsRepository> { DefaultReelsRepository(get(), get(), get()) }
+    single<FeedRepository> { DefaultFeedRepository(get(), get(), get()) }
     single<PostInteractionStore> {
         SqlDelightPostInteractionStore(
             database = get(),
-            migrator = get(),
             json = get(),
             dispatchers = get(),
         )
@@ -71,7 +76,6 @@ val networkModule = module {
     single<ReelInteractionStore> {
         SqlDelightReelInteractionStore(
             database = get(),
-            migrator = get(),
             json = get(),
             dispatchers = get(),
         )
@@ -79,7 +83,6 @@ val networkModule = module {
     single<FeedInteractionStore> {
         SqlDelightFeedInteractionStore(
             database = get(),
-            migrator = get(),
             dispatchers = get(),
         )
     }

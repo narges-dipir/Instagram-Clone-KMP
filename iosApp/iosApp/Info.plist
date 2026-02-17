@@ -4,6 +4,17 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInMedia</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>We use the camera so you can capture photos for new posts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We use your photo library so you can pick media for new posts.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We save captured photos to your library for later use.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
