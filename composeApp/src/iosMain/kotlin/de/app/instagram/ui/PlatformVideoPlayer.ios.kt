@@ -6,6 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +18,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVPlayerItemDidPlayToEndTimeNotification
 import platform.AVFoundation.AVPlayerLayer
 import platform.AVFoundation.AVPlayerItemFailedToPlayToEndTimeNotification
 import platform.CoreGraphics.CGRectZero
@@ -39,17 +44,22 @@ actual fun PlatformVideoPlayer(
 
     val player = remember { AVPlayer() }
     val playerLayer = remember { AVPlayerLayer.playerLayerWithPlayer(player) }
+    val shouldPlayState = rememberUpdatedState(shouldPlay)
+    val videoUrlState = rememberUpdatedState(videoUrl)
+    var currentItem by remember { mutableStateOf<AVPlayerItem?>(null) }
 
     LaunchedEffect(videoUrl) {
         val item = NSURL.URLWithString(videoUrl)?.let { AVPlayerItem(uRL = it) }
+        currentItem = item
         player.performSelector(
             NSSelectorFromString("replaceCurrentItemWithPlayerItem:"),
             withObject = item,
         )
         if (shouldPlay) {
             player.performSelector(NSSelectorFromString("play"))
+        } else {
+            player.performSelector(NSSelectorFromString("pause"))
         }
-        println("PlatformVideoPlayer(iOS): loaded URL=$videoUrl itemNull=${item == null}")
     }
 
     LaunchedEffect(shouldPlay) {
@@ -61,7 +71,10 @@ actual fun PlatformVideoPlayer(
     }
 
     LaunchedEffect(isMuted) {
-        // setMuted/setVolume bindings are not available in this Kotlin/Native setup.
+        player.performSelector(
+            NSSelectorFromString("setMuted:"),
+            withObject = isMuted,
+        )
     }
 
     UIKitView(
@@ -79,15 +92,38 @@ actual fun PlatformVideoPlayer(
         },
     )
 
-    DisposableEffect(player) {
+    DisposableEffect(currentItem) {
+        val item = currentItem
         val failureObserver = NSNotificationCenter.defaultCenter.addObserverForName(
             name = AVPlayerItemFailedToPlayToEndTimeNotification,
-            `object` = null,
+            `object` = item,
             queue = null,
-        ) { notification ->
-            println("PlatformVideoPlayer(iOS): failedToPlayToEnd userInfo=${notification?.userInfo}")
+        ) { _ -> }
+        val endObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+            name = AVPlayerItemDidPlayToEndTimeNotification,
+            `object` = item,
+            queue = null,
+        ) { _ ->
+            val loopItem = NSURL.URLWithString(videoUrlState.value)?.let { AVPlayerItem(uRL = it) }
+            currentItem = loopItem
+            player.performSelector(
+                NSSelectorFromString("replaceCurrentItemWithPlayerItem:"),
+                withObject = loopItem,
+            )
+            if (shouldPlayState.value) {
+                player.performSelector(NSSelectorFromString("play"))
+            } else {
+                player.performSelector(NSSelectorFromString("pause"))
+            }
         }
 
+        onDispose {
+            NSNotificationCenter.defaultCenter.removeObserver(failureObserver)
+            NSNotificationCenter.defaultCenter.removeObserver(endObserver)
+        }
+    }
+
+    DisposableEffect(player) {
         onDispose {
             player.performSelector(NSSelectorFromString("pause"))
             player.performSelector(
@@ -95,7 +131,6 @@ actual fun PlatformVideoPlayer(
                 withObject = null,
             )
             playerLayer.removeFromSuperlayer()
-            NSNotificationCenter.defaultCenter.removeObserver(failureObserver)
         }
     }
 }

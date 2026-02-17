@@ -62,6 +62,17 @@ A Kotlin Multiplatform Instagram-style clone targeting Android and iOS with shar
 ./gradlew :composeApp:testDebugUnitTest
 ```
 
+### iOS E2E + Launch Benchmark (Xcode)
+```bash
+xcodebuild test \
+  -project iosApp/iosApp.xcodeproj \
+  -scheme iosApp \
+  -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+  -only-testing:iosAppTests \
+  -only-testing:iosAppUITests/IOSAppUITests \
+  -only-testing:iosAppUITests/IOSAppLaunchPerformanceTests
+```
+
 ## Benchmark Manual
 ### Prerequisites
 1. Connect a physical Android device (recommended for macrobenchmarks).

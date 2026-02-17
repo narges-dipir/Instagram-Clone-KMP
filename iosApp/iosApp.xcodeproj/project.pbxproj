@@ -6,7 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		73A0A4B65F7C4A5C8A3E1001 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A0A4B65F7C4A5C8A3E1002 /* XCTest.framework */; };
+		73A0A4B65F7C4A5C8A3E1003 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73A0A4B65F7C4A5C8A3E1002 /* XCTest.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		73A0A4B65F7C4A5C8A3E1004 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE94B35EDAC4261A6A81D940 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3075840B365619362E865ECD;
+			remoteInfo = iosApp;
+		};
+		73A0A4B65F7C4A5C8A3E1005 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE94B35EDAC4261A6A81D940 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3075840B365619362E865ECD;
+			remoteInfo = iosApp;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		73A0A4B65F7C4A5C8A3E1002 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		73A0A4B65F7C4A5C8A3E1006 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		73A0A4B65F7C4A5C8A3E1007 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		812C2D855AF51E67B3F398C4 /* InstagramClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstagramClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -29,6 +54,16 @@
 			path = iosApp;
 			sourceTree = "<group>";
 		};
+		73A0A4B65F7C4A5C8A3E1008 /* iosAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = iosAppTests;
+			sourceTree = "<group>";
+		};
+		73A0A4B65F7C4A5C8A3E1009 /* iosAppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = iosAppUITests;
+			sourceTree = "<group>";
+		};
 		E2A76C31FDD925E637F861CE /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Configuration;
@@ -44,6 +79,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		73A0A4B65F7C4A5C8A3E1010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				73A0A4B65F7C4A5C8A3E1001 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		73A0A4B65F7C4A5C8A3E1011 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				73A0A4B65F7C4A5C8A3E1003 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -51,6 +102,8 @@
 			isa = PBXGroup;
 			children = (
 				812C2D855AF51E67B3F398C4 /* InstagramClone.app */,
+				73A0A4B65F7C4A5C8A3E1006 /* iosAppTests.xctest */,
+				73A0A4B65F7C4A5C8A3E1007 /* iosAppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -60,6 +113,9 @@
 			children = (
 				E2A76C31FDD925E637F861CE /* Configuration */,
 				07722C16896416081B1BFABC /* iosApp */,
+				73A0A4B65F7C4A5C8A3E1008 /* iosAppTests */,
+				73A0A4B65F7C4A5C8A3E1009 /* iosAppUITests */,
+				73A0A4B65F7C4A5C8A3E1002 /* XCTest.framework */,
 				4D2D14C782ED480DB93199E2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +146,52 @@
 			productReference = 812C2D855AF51E67B3F398C4 /* InstagramClone.app */;
 			productType = "com.apple.product-type.application";
 		};
+		73A0A4B65F7C4A5C8A3E1012 /* iosAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73A0A4B65F7C4A5C8A3E1013 /* Build configuration list for PBXNativeTarget "iosAppTests" */;
+			buildPhases = (
+				73A0A4B65F7C4A5C8A3E1014 /* Sources */,
+				73A0A4B65F7C4A5C8A3E1010 /* Frameworks */,
+				73A0A4B65F7C4A5C8A3E1015 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				73A0A4B65F7C4A5C8A3E1016 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				73A0A4B65F7C4A5C8A3E1008 /* iosAppTests */,
+			);
+			name = iosAppTests;
+			packageProductDependencies = (
+			);
+			productName = iosAppTests;
+			productReference = 73A0A4B65F7C4A5C8A3E1006 /* iosAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		73A0A4B65F7C4A5C8A3E1017 /* iosAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73A0A4B65F7C4A5C8A3E1018 /* Build configuration list for PBXNativeTarget "iosAppUITests" */;
+			buildPhases = (
+				73A0A4B65F7C4A5C8A3E1019 /* Sources */,
+				73A0A4B65F7C4A5C8A3E1011 /* Frameworks */,
+				73A0A4B65F7C4A5C8A3E101A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				73A0A4B65F7C4A5C8A3E101B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				73A0A4B65F7C4A5C8A3E1009 /* iosAppUITests */,
+			);
+			name = iosAppUITests;
+			packageProductDependencies = (
+			);
+			productName = iosAppUITests;
+			productReference = 73A0A4B65F7C4A5C8A3E1007 /* iosAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -102,6 +204,14 @@
 				TargetAttributes = {
 					3075840B365619362E865ECD = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					73A0A4B65F7C4A5C8A3E1012 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 3075840B365619362E865ECD;
+					};
+					73A0A4B65F7C4A5C8A3E1017 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 3075840B365619362E865ECD;
 					};
 				};
 			};
@@ -120,11 +230,27 @@
 			projectRoot = "";
 			targets = (
 				3075840B365619362E865ECD /* iosApp */,
+				73A0A4B65F7C4A5C8A3E1012 /* iosAppTests */,
+				73A0A4B65F7C4A5C8A3E1017 /* iosAppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		73A0A4B65F7C4A5C8A3E1015 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		73A0A4B65F7C4A5C8A3E101A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		898F969F06E8455F2F615013 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -164,7 +290,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		73A0A4B65F7C4A5C8A3E1014 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		73A0A4B65F7C4A5C8A3E1019 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		73A0A4B65F7C4A5C8A3E1016 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3075840B365619362E865ECD /* iosApp */;
+			targetProxy = 73A0A4B65F7C4A5C8A3E1004 /* PBXContainerItemProxy */;
+		};
+		73A0A4B65F7C4A5C8A3E101B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3075840B365619362E865ECD /* iosApp */;
+			targetProxy = 73A0A4B65F7C4A5C8A3E1005 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		47DAA6387F8B113AF18B25DB /* Debug */ = {
@@ -238,6 +391,7 @@
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
@@ -260,12 +414,99 @@
 			};
 			name = Debug;
 		};
+		73A0A4B65F7C4A5C8A3E101C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.app.instagram.InstagramCloneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InstagramClone.app/InstagramClone";
+			};
+			name = Debug;
+		};
+		73A0A4B65F7C4A5C8A3E101D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.app.instagram.InstagramCloneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/InstagramClone.app/InstagramClone";
+			};
+			name = Release;
+		};
+		73A0A4B65F7C4A5C8A3E101E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.app.instagram.InstagramCloneUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iosApp;
+			};
+			name = Debug;
+		};
+		73A0A4B65F7C4A5C8A3E101F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.app.instagram.InstagramCloneUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iosApp;
+			};
+			name = Release;
+		};
 		C251792B7078995290BE5C48 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
@@ -354,6 +595,24 @@
 			buildConfigurations = (
 				47DAA6387F8B113AF18B25DB /* Debug */,
 				FF07F51E97461C62E79830A6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		73A0A4B65F7C4A5C8A3E1013 /* Build configuration list for PBXNativeTarget "iosAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73A0A4B65F7C4A5C8A3E101C /* Debug */,
+				73A0A4B65F7C4A5C8A3E101D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		73A0A4B65F7C4A5C8A3E1018 /* Build configuration list for PBXNativeTarget "iosAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73A0A4B65F7C4A5C8A3E101E /* Debug */,
+				73A0A4B65F7C4A5C8A3E101F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

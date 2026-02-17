@@ -1,18 +1,33 @@
 package de.app.instagram.profile.data.repository
 
+import de.app.instagram.db.RemoteContentCache
 import de.app.instagram.profile.data.remote.ProfileApi
+import de.app.instagram.profile.data.remote.ProfileDto
 import de.app.instagram.profile.domain.model.Profile
 import de.app.instagram.profile.domain.model.PostMediaType
 import de.app.instagram.profile.domain.model.ProfilePost
 import de.app.instagram.profile.domain.model.ProfileStats
 import de.app.instagram.profile.domain.model.StoryHighlight
 import de.app.instagram.profile.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 
 class DefaultProfileRepository(
     private val profileApi: ProfileApi,
+    private val remoteContentCache: RemoteContentCache,
+    private val json: Json,
 ) : ProfileRepository {
     override suspend fun getProfile(): Profile {
-        val dto = profileApi.getProfile()
+        val cacheKey = cacheKey()
+        val networkFailure = runCatching {
+            val remoteDto = profileApi.getProfile()
+            remoteContentCache.write(cacheKey, json.encodeToString(ProfileDto.serializer(), remoteDto))
+        }.exceptionOrNull()
+
+        val cachedDto = remoteContentCache.observe(cacheKey).first()?.let { payload ->
+            json.decodeFromString(ProfileDto.serializer(), payload)
+        }
+        val dto = cachedDto ?: throw (networkFailure ?: IllegalStateException("Profile cache is empty"))
         return Profile(
             id = dto.id,
             username = dto.username,
@@ -52,6 +67,8 @@ class DefaultProfileRepository(
             },
         )
     }
+
+    private fun cacheKey(): String = "content_cache.profile"
 
     private companion object {
         val FALLBACK_HIGHLIGHT_MEDIA = mapOf(

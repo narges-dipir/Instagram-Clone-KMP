@@ -1,13 +1,13 @@
 package de.app.instagram.reels.presentation.viewmodel
 
 import de.app.instagram.reels.domain.usecase.GetReelsPageUseCase
-import de.app.instagram.reels.data.local.InMemoryReelInteractionStore
 import de.app.instagram.reels.data.local.LocalReelInteraction
 import de.app.instagram.reels.data.local.ReelInteractionStore
 import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.reels.domain.model.ReelVideo
 import de.app.instagram.reels.presentation.state.ReelsUiState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,16 +16,22 @@ import kotlinx.coroutines.launch
 
 class ReelsViewModel(
     private val getReelsPageUseCase: GetReelsPageUseCase,
-    private val reelInteractionStore: ReelInteractionStore = InMemoryReelInteractionStore(),
+    private val reelInteractionStore: ReelInteractionStore,
     private val scope: CoroutineScope = createDefaultAppScope(),
 ) {
     private val _uiState = MutableStateFlow(ReelsUiState())
     val uiState: StateFlow<ReelsUiState> = _uiState.asStateFlow()
+    private val localInteractions = MutableStateFlow<Map<String, LocalReelInteraction>>(emptyMap())
 
     private var nextPage: Int = 1
     private var loopRound: Int = 0
 
     init {
+        scope.launch {
+            reelInteractionStore.observeAll().collect { snapshot ->
+                localInteractions.value = snapshot
+            }
+        }
         loadNextPage()
     }
 
@@ -44,10 +50,10 @@ class ReelsViewModel(
             val previousState = _uiState.value
             try {
                 val pageData = getReelsPageUseCase(nextPage)
-                val localInteractions = reelInteractionStore.readAll()
+                val localInteractionsSnapshot = localInteractions.value
                 val normalizedItems = pageData.items.map { item ->
                     val baseId = item.id
-                    val local = localInteractions[baseId]
+                    val local = localInteractionsSnapshot[baseId]
                     item.copy(
                         id = "${item.id}_r${loopRound}",
                         likes = item.likes + if (local?.isLikedByMe == true) 1 else 0,
@@ -74,7 +80,7 @@ class ReelsViewModel(
                     isLoadingMore = false,
                     errorMessage = null,
                 )
-                seedMissingInteractions(pageData.items.map { it.id }, localInteractions)
+                seedMissingInteractions(pageData.items.map { it.id }, localInteractionsSnapshot)
             } catch (t: Throwable) {
                 _uiState.value = previousState.copy(
                     isInitialLoading = false,
@@ -99,10 +105,12 @@ class ReelsViewModel(
         }
         scope.launch {
             val baseId = baseReelId(reelId)
-            val current = reelInteractionStore.readAll()[baseId] ?: LocalReelInteraction()
+            val current = localInteractions.value[baseId] ?: LocalReelInteraction()
+            val updatedInteraction = current.copy(isLikedByMe = updated.isLikedByMe)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             reelInteractionStore.save(
                 reelId = baseId,
-                interaction = current.copy(isLikedByMe = updated.isLikedByMe),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -118,10 +126,12 @@ class ReelsViewModel(
             )
             scope.launch {
                 val baseId = baseReelId(reelId)
-                val current = reelInteractionStore.readAll()[baseId] ?: LocalReelInteraction()
+                val current = localInteractions.value[baseId] ?: LocalReelInteraction()
+                val updatedInteraction = current.copy(comments = current.comments + trimmed)
+                localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
                 reelInteractionStore.save(
                     reelId = baseId,
-                    interaction = current.copy(comments = current.comments + trimmed),
+                    interaction = updatedInteraction,
                 )
             }
             updated
@@ -132,10 +142,12 @@ class ReelsViewModel(
         val updated = reel.copy(shares = reel.shares + 1)
         scope.launch {
             val baseId = baseReelId(reelId)
-            val current = reelInteractionStore.readAll()[baseId] ?: LocalReelInteraction()
+            val current = localInteractions.value[baseId] ?: LocalReelInteraction()
+            val updatedInteraction = current.copy(localShares = current.localShares + 1)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             reelInteractionStore.save(
                 reelId = baseId,
-                interaction = current.copy(localShares = current.localShares + 1),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -145,10 +157,12 @@ class ReelsViewModel(
         val updated = reel.copy(isSavedByMe = !reel.isSavedByMe)
         scope.launch {
             val baseId = baseReelId(reelId)
-            val current = reelInteractionStore.readAll()[baseId] ?: LocalReelInteraction()
+            val current = localInteractions.value[baseId] ?: LocalReelInteraction()
+            val updatedInteraction = current.copy(isSavedByMe = updated.isSavedByMe)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             reelInteractionStore.save(
                 reelId = baseId,
-                interaction = current.copy(isSavedByMe = updated.isSavedByMe),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -158,10 +172,12 @@ class ReelsViewModel(
         val updated = reel.copy(isFollowingCreator = !reel.isFollowingCreator)
         scope.launch {
             val baseId = baseReelId(reelId)
-            val current = reelInteractionStore.readAll()[baseId] ?: LocalReelInteraction()
+            val current = localInteractions.value[baseId] ?: LocalReelInteraction()
+            val updatedInteraction = current.copy(isFollowingCreator = updated.isFollowingCreator)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             reelInteractionStore.save(
                 reelId = baseId,
-                interaction = current.copy(isFollowingCreator = updated.isFollowingCreator),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -192,6 +208,7 @@ class ReelsViewModel(
         val missing = reelIds.map(::baseReelId).distinct().filterNot(existing::containsKey)
         if (missing.isEmpty()) return
         missing.forEach { id ->
+            localInteractions.value = localInteractions.value + (id to LocalReelInteraction())
             reelInteractionStore.save(reelId = id, interaction = LocalReelInteraction())
         }
     }

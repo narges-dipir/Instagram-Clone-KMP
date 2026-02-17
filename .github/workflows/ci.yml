@@ -50,3 +50,13 @@ jobs:
 
       - name: Verify iOS Kotlin build
         run: ./gradlew :composeApp:compileKotlinIosSimulatorArm64 :composeApp:linkDebugFrameworkIosSimulatorArm64
+
+      - name: Run iOS unit, UI, and launch performance tests
+        run: |
+          xcodebuild test \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+            -only-testing:iosAppTests \
+            -only-testing:iosAppUITests/IOSAppUITests \
+            -only-testing:iosAppUITests/IOSAppLaunchPerformanceTests

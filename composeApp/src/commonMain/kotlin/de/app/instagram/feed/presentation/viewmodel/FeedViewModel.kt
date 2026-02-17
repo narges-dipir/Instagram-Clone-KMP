@@ -1,13 +1,13 @@
 package de.app.instagram.feed.presentation.viewmodel
 
 import de.app.instagram.feed.data.local.FeedInteractionStore
-import de.app.instagram.feed.data.local.InMemoryFeedInteractionStore
 import de.app.instagram.feed.data.local.LocalFeedInteraction
 import de.app.instagram.di.createDefaultAppScope
 import de.app.instagram.feed.domain.model.FeedPost
 import de.app.instagram.feed.domain.usecase.GetFeedPageUseCase
 import de.app.instagram.feed.presentation.state.FeedUiState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,16 +16,22 @@ import kotlinx.coroutines.launch
 
 class FeedViewModel(
     private val getFeedPageUseCase: GetFeedPageUseCase,
-    private val feedInteractionStore: FeedInteractionStore = InMemoryFeedInteractionStore(),
+    private val feedInteractionStore: FeedInteractionStore,
     private val scope: CoroutineScope = createDefaultAppScope(),
 ) {
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState.asStateFlow()
+    private val localInteractions = MutableStateFlow<Map<String, LocalFeedInteraction>>(emptyMap())
 
     private var nextPage = 1
     private var loopRound = 0
 
     init {
+        scope.launch {
+            feedInteractionStore.observeAll().collect { snapshot ->
+                localInteractions.value = snapshot
+            }
+        }
         loadNextPage()
     }
 
@@ -44,10 +50,10 @@ class FeedViewModel(
         scope.launch {
             runCatching { getFeedPageUseCase(nextPage) }
                 .onSuccess { pageData ->
-                    val localInteractions = feedInteractionStore.readAll()
+                    val localInteractionsSnapshot = localInteractions.value
                     val isLoopStart = !pageData.hasNext
                     val pageItemsWithRound = pageData.items.map { post ->
-                        val local = localInteractions[basePostId(post.id)]
+                        val local = localInteractionsSnapshot[basePostId(post.id)]
                         post.copy(
                             id = "${post.id}_r$loopRound",
                             likes = post.likes + if (local?.isLikedByMe == true) 1 else 0,
@@ -65,7 +71,7 @@ class FeedViewModel(
                             errorMessage = null,
                         )
                     }
-                    seedMissingInteractions(pageData.items.map { it.id }, localInteractions)
+                    seedMissingInteractions(pageData.items.map { it.id }, localInteractionsSnapshot)
 
                     if (isLoopStart) {
                         nextPage = 1
@@ -101,10 +107,12 @@ class FeedViewModel(
 
         scope.launch {
             val baseId = basePostId(postId)
-            val current = feedInteractionStore.readAll()[baseId] ?: LocalFeedInteraction()
+            val current = localInteractions.value[baseId] ?: LocalFeedInteraction()
+            val updatedInteraction = current.copy(isLikedByMe = updated.isLikedByMe)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             feedInteractionStore.save(
                 postId = baseId,
-                interaction = current.copy(isLikedByMe = updated.isLikedByMe),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -114,10 +122,12 @@ class FeedViewModel(
         val updated = post.copy(isSavedByMe = !post.isSavedByMe)
         scope.launch {
             val baseId = basePostId(postId)
-            val current = feedInteractionStore.readAll()[baseId] ?: LocalFeedInteraction()
+            val current = localInteractions.value[baseId] ?: LocalFeedInteraction()
+            val updatedInteraction = current.copy(isSavedByMe = updated.isSavedByMe)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             feedInteractionStore.save(
                 postId = baseId,
-                interaction = current.copy(isSavedByMe = updated.isSavedByMe),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -127,10 +137,12 @@ class FeedViewModel(
         val updated = post.copy(comments = post.comments + 1)
         scope.launch {
             val baseId = basePostId(postId)
-            val current = feedInteractionStore.readAll()[baseId] ?: LocalFeedInteraction()
+            val current = localInteractions.value[baseId] ?: LocalFeedInteraction()
+            val updatedInteraction = current.copy(localComments = current.localComments + 1)
+            localInteractions.value = localInteractions.value + (baseId to updatedInteraction)
             feedInteractionStore.save(
                 postId = baseId,
-                interaction = current.copy(localComments = current.localComments + 1),
+                interaction = updatedInteraction,
             )
         }
         updated
@@ -160,6 +172,7 @@ class FeedViewModel(
         val missing = postIds.map(::basePostId).distinct().filterNot(existing::containsKey)
         if (missing.isEmpty()) return
         missing.forEach { id ->
+            localInteractions.value = localInteractions.value + (id to LocalFeedInteraction())
             feedInteractionStore.save(postId = id, interaction = LocalFeedInteraction())
         }
     }

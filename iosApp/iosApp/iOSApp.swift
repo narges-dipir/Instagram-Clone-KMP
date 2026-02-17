@@ -27,15 +27,19 @@ class IOSAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterD
 
         let center = UNUserNotificationCenter.current()
         center.delegate = self
-        #if DEBUG
-        print("Push registration skipped in DEBUG build (no aps-environment entitlement required).")
-        #else
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if let error {
+                print("Push authorization request failed: \(error.localizedDescription)")
+                return
+            }
+            guard granted else {
+                print("Push authorization denied by user.")
+                return
+            }
             DispatchQueue.main.async {
                 application.registerForRemoteNotifications()
             }
         }
-        #endif
 
         #if canImport(FirebaseMessaging)
         Messaging.messaging().delegate = self

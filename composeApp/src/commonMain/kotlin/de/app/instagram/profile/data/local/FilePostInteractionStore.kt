@@ -7,6 +7,8 @@ import de.app.instagram.storage.postInteractionsStoragePath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -28,6 +30,9 @@ class FilePostInteractionStore(
     private var flushJob: Job? = null
     private var cacheLoaded = false
     private val cache = mutableMapOf<String, LocalPostInteraction>()
+    private val state = MutableStateFlow<Map<String, LocalPostInteraction>>(emptyMap())
+
+    override fun observeAll(): Flow<Map<String, LocalPostInteraction>> = state
 
     override suspend fun readAll(): Map<String, LocalPostInteraction> = mutex.withLock {
         ensureLoadedLocked()
@@ -38,6 +43,7 @@ class FilePostInteractionStore(
         mutex.withLock {
             ensureLoadedLocked()
             cache[postId] = interaction
+            state.value = cache.toMap()
             scheduleFlushLocked()
         }
     }
@@ -47,6 +53,7 @@ class FilePostInteractionStore(
         cache.clear()
         cache.putAll(readAllInternal())
         cacheLoaded = true
+        state.value = cache.toMap()
     }
 
     private fun scheduleFlushLocked() {
